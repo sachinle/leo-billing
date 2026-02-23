@@ -151,6 +151,29 @@ function Toast({ toasts }) {
   );
 }
 
+// ── Avatar — handles WebView image load failures gracefully ──────────────────
+// In Capacitor Android, Google profile photo URLs (lh3.googleusercontent.com)
+// are sometimes blocked by WebView CORS/security policy.
+// onError falls back to the initials letter avatar so it never shows broken.
+function AvatarImage({ user }) {
+  const [imgFailed, setImgFailed] = useState(false);
+  const initial = (user?.displayName || user?.email || 'U')[0].toUpperCase();
+
+  if (user?.photoURL && !imgFailed) {
+    return (
+      <img
+        src={user.photoURL}
+        alt="avatar"
+        referrerPolicy="no-referrer"
+        crossOrigin="anonymous"
+        onError={() => setImgFailed(true)}
+        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+      />
+    );
+  }
+  return <span>{initial}</span>;
+}
+
 export default function Profile() {
   const { user } = useAuth();
   const [form, setForm]           = useState(EMPTY_PROFILE);
@@ -233,9 +256,7 @@ export default function Profile() {
       {/* Google account info banner */}
       <div className="profile__google-banner">
         <div className="profile__google-avatar">
-          {user?.photoURL
-            ? <img src={user.photoURL} alt="avatar" />
-            : <span>{(user?.displayName || user?.email || 'U')[0].toUpperCase()}</span>}
+          <AvatarImage user={user} />
         </div>
         <div>
           <div className="profile__google-name">{user?.displayName || 'Account'}</div>
