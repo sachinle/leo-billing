@@ -167,47 +167,6 @@ src/
 
 ## 🤝 Contributing
 
-Contributions, issues and feature requests are welcome! Feel free to open an [issue](https://github.com/yourusername/leo-billing/issues) or submit a pull request.
-
----
-
----
-
----
-
-## 🖼️ How to Add Screenshots
-
-> Follow these steps once to add real screenshots to this README.
-
-**Step 1 — Take screenshots of your app**
-
-On Android, press **Volume Down + Power** button simultaneously. Screenshots save to your Gallery.
-
-The recommended shots are:
-- `dashboard.png` — the main dashboard
-- `invoices.png` — the invoices list page
-- `create-invoice.png` — the create invoice form
-- `view-invoice.png` — a completed invoice view
-- `dark-mode.png` — any page in dark mode
-- `share.png` — the share/export bottom bar
-
-**Step 2 — Create a `screenshots/` folder in your repo**
-
-```bash
-mkdir screenshots
-```
-
-Copy your screenshot images into this folder and name them exactly as above.
-
-**Step 3 — Commit and push**
-
-```bash
-git add screenshots/
-git commit -m "Add app screenshots"
-git push
-```
-
-The README will automatically show your screenshots — no other changes needed! GitHub renders the images inline using the relative paths already set up in the table above.
-
-**💡 Tip:** For best results, crop your screenshots to just the app screen (remove the phone status bar) and resize them to roughly the same height so the table looks balanced. A free tool like [Canva](https://canva.com) or [remove.bg](https://remove.bg) can help clean them up.
+Contributions, issues and feature requests are welcome! Feel free to open an [issue](https://github.com/sachinle/leo-billing/issues) or submit a pull request.
+(https://canva.com) or [remove.bg](https://remove.bg) can help clean them up.
 
