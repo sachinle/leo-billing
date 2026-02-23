@@ -67,13 +67,45 @@ async function withReceiptVisible(el, fn) {
 // ── Capture element to canvas ─────────────────────────────────────────────────
 async function captureElement(element) {
   return withReceiptVisible(element, async (el) => {
-    const prev   = forceWidth(el);
+    // Wait for all fonts to finish loading — fixes "design not applied" on web
+    // where Google Fonts may still be downloading when capture runs
+    try { await document.fonts.ready; } catch (_) {}
+
+    const prev = forceWidth(el);
+
     const canvas = await html2canvas(el, {
-      scale: 2, useCORS: true, allowTaint: true,
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
       backgroundColor: '#ffffff',
-      width: A4_PX, windowWidth: A4_PX + 80,
+      width: A4_PX,
+      windowWidth: A4_PX + 80,
       logging: false,
+      // These fix off-screen / scrolled-page capture on web browsers:
+      scrollX: 0,
+      scrollY: 0,
+      x: 0,
+      y: 0,
+      // Ensure cloned document inherits computed styles properly:
+      onclone: (clonedDoc) => {
+        // Copy all computed CSS variables from root to cloned doc root
+        // so the clone has access to --gold, --bg, --card etc.
+        const srcRoot  = document.documentElement;
+        const dstRoot  = clonedDoc.documentElement;
+        const computed = getComputedStyle(srcRoot);
+        // Copy key theme variables
+        [
+          '--bg','--card','--border','--text-primary','--text-secondary',
+          '--text-muted','--gold','--accent',
+        ].forEach(v => {
+          const val = computed.getPropertyValue(v);
+          if (val) dstRoot.style.setProperty(v, val);
+        });
+        // Force data-theme attribute on cloned doc so CSS selectors work
+        dstRoot.setAttribute('data-theme', srcRoot.getAttribute('data-theme') || 'dark');
+      },
     });
+
     restoreWidth(el, prev);
     return canvas;
   });
