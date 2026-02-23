@@ -7,7 +7,7 @@
 ### Home Business Invoicing — Simple, Fast, Unlimited
 
 [![Live Demo](https://img.shields.io/badge/🌐%20Live%20Demo-leo--billing.vercel.app-c9a96e?style=for-the-badge)](https://leo-billing.vercel.app/)
-[![Download APK](https://img.shields.io/badge/📲%20Download%20APK-Latest%20Release-3ddc84?style=for-the-badge)](https://github.com/sachinle/leo-billing/releases/latest)
+[![Download APK](https://img.shields.io/badge/📲%20Download%20APK-Latest%20Release-3ddc84?style=for-the-badge)](https://github.com/sachinle/leo-billing/releases/latest/leobilling.apk)
 [![React](https://img.shields.io/badge/React-19-61dafb?style=flat-square&logo=react)](https://react.dev)
 [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ecf8e?flat-square&logo=supabase)](https://supabase.com)
 [![Capacitor](https://img.shields.io/badge/Capacitor-Android-119eff?flat-square&logo=capacitor)](https://capacitorjs.com)
