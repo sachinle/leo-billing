@@ -1,0 +1,466 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap');
+
+/* ── Theme Variables ── */
+:root {
+  --gold: #c9a96e;
+  --gold-light: #e8d5b0;
+  --gold-dim: rgba(201, 169, 110, 0.12);
+
+  /* Dark (default) */
+  --bg: #0a0a0f;
+  --card: #14141c;
+  --border: rgba(201, 169, 110, 0.18);
+  --text-primary: #f0ece4;
+  --text-secondary: #ebe9ef;
+  --text-muted: #8f8e96;
+  --input-bg: rgba(255, 255, 255, 0.03);
+  --toggle-bg: rgba(255, 255, 255, 0.05);
+  --toggle-active-bg: rgba(201, 169, 110, 0.12);
+  --error-bg: rgba(224, 112, 112, 0.1);
+  --error-color: #e07070;
+  --error-border: rgba(224, 112, 112, 0.2);
+  --success-bg: rgba(112, 196, 154, 0.1);
+  --success-color: #70c49a;
+  --success-border: rgba(112, 196, 154, 0.2);
+  --shadow: 0 24px 64px rgba(0, 0, 0, 0.55), 0 0 0 1px var(--border);
+  --ambient1: rgba(201, 169, 110, 0.07);
+  --ambient2: rgba(90, 70, 170, 0.05);
+}
+
+[data-theme="light"] {
+  --bg: #f2ede3;
+  --card: #ffffff;
+  --border: rgba(180, 140, 80, 0.22);
+  --text-primary: #1a1610;
+  --text-secondary: #5a5040;
+  --text-muted: #a09070;
+  --input-bg: rgba(0, 0, 0, 0.025);
+  --toggle-bg: rgba(0, 0, 0, 0.05);
+  --toggle-active-bg: rgba(201, 169, 110, 0.15);
+  --error-bg: rgba(200, 60, 60, 0.07);
+  --error-color: #b03030;
+  --error-border: rgba(200, 60, 60, 0.2);
+  --success-bg: rgba(40, 140, 80, 0.08);
+  --success-color: #287850;
+  --success-border: rgba(40, 140, 80, 0.2);
+  --shadow: 0 24px 64px rgba(160, 120, 40, 0.1), 0 4px 16px rgba(0, 0, 0, 0.06), 0 0 0 1px var(--border);
+  --ambient1: rgba(201, 169, 110, 0.2);
+  --ambient2: rgba(180, 140, 60, 0.1);
+}
+
+/* ── Container — owns its own full-page centering ── */
+.login-container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px 16px;
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+  transition: background 0.35s ease;
+}
+
+/* Ambient glow */
+.login-container::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 55% at 25% 35%, var(--ambient1) 0%, transparent 60%),
+    radial-gradient(ellipse 55% 65% at 75% 65%, var(--ambient2) 0%, transparent 55%);
+  pointer-events: none;
+  transition: background 0.35s ease;
+  z-index: 0;
+}
+
+/* Noise texture */
+.login-container::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none;
+  opacity: 0.4;
+  z-index: 0;
+}
+
+/* ── Card ── */
+.login-card {
+  background: var(--card);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  padding: 44px 40px;
+  width: 100%;
+  max-width: 420px;
+  position: relative;
+  z-index: 1;
+  animation: cardIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+  transition: background 0.35s ease, box-shadow 0.35s ease;
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(28px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Corner brackets */
+.card-corner-tr,
+.card-corner-bl {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  pointer-events: none;
+  transition: border-color 0.35s;
+}
+.card-corner-tr {
+  top: 16px; right: 16px;
+  border-top: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+}
+.card-corner-bl {
+  bottom: 16px; left: 16px;
+  border-bottom: 1px solid var(--border);
+  border-left: 1px solid var(--border);
+}
+
+/* ── Theme Toggle ── */
+.theme-toggle {
+  position: absolute;
+  top: 16px;
+  right: 56px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  line-height: 1;
+  transition: all 0.2s ease;
+  z-index: 2;
+  padding: 0;
+}
+.theme-toggle:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: var(--gold-dim);
+}
+
+/* ── Header ── */
+.form-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.7rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+  transition: color 0.35s;
+}
+.form-logo span { color: var(--gold); }
+
+.form-subtitle {
+  font-size: 0.84rem;
+  color: var(--text-muted);
+  margin-bottom: 32px;
+  font-weight: 300;
+  transition: color 0.35s;
+}
+
+/* ── Mode Toggle ── */
+.mode-toggle {
+  display: flex;
+  background: var(--toggle-bg);
+  border-radius: 10px;
+  padding: 4px;
+  gap: 4px;
+  margin-bottom: 28px;
+  transition: background 0.35s;
+}
+
+.mode-toggle button {
+  flex: 1;
+  padding: 10px 8px;
+  border: none;
+  background: transparent;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 400;
+  font-size: 0.87rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 7px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.mode-toggle button.active {
+  background: var(--toggle-active-bg);
+  color: var(--gold);
+  font-weight: 500;
+}
+
+.mode-toggle button:hover:not(.active) { color: var(--text-secondary); }
+
+/* ── Form ── */
+.email-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input-group label {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  transition: color 0.35s;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 13px 15px;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem; /* 16px — prevents iOS zoom on focus */
+  color: var(--text-primary);
+  outline: none;
+  transition: all 0.2s ease;
+  -webkit-appearance: none; /* removes iOS default styling */
+  appearance: none;
+}
+
+.input-group input::placeholder { color: var(--text-muted); font-weight: 300; }
+
+.input-group input:focus {
+  border-color: var(--gold);
+  background: var(--gold-dim);
+  box-shadow: 0 0 0 3px rgba(201, 169, 110, 0.08);
+}
+
+.forgot-link {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.8rem;
+  cursor: pointer;
+  text-align: right;
+  align-self: flex-end;
+  margin-top: -4px;
+  padding: 4px 0; /* larger tap target on mobile */
+  transition: color 0.2s;
+}
+.forgot-link:hover { color: var(--gold); }
+
+/* ── Primary Button ── */
+.primary-btn {
+  width: 100%;
+  padding: 15px;
+  background: var(--gold);
+  border: none;
+  border-radius: 10px;
+  color: #0a0808;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  font-size: 0.87rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.25s ease;
+  margin-top: 4px;
+  -webkit-tap-highlight-color: transparent;
+  /* min tap target */
+  min-height: 48px;
+}
+
+.primary-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.16) 0%, transparent 55%);
+  pointer-events: none;
+}
+
+.primary-btn:hover:not(:disabled) {
+  background: var(--gold-light);
+  box-shadow: 0 8px 28px rgba(201, 169, 110, 0.3);
+  transform: translateY(-1px);
+}
+
+.primary-btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.primary-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Divider ── */
+.divider {
+  position: relative;
+  text-align: center;
+  margin: 24px 0;
+}
+
+.divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0; right: 0;
+  height: 1px;
+  background: var(--border);
+  transition: background 0.35s;
+}
+
+.divider span {
+  position: relative;
+  background: var(--card);
+  padding: 0 12px;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: background 0.35s, color 0.35s;
+}
+
+/* ── Google Button ── */
+.google-btn {
+  width: 100%;
+  padding: 13px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 400;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 48px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.google-btn:hover:not(:disabled) {
+  border-color: rgba(201, 169, 110, 0.4);
+  background: var(--gold-dim);
+  color: var(--text-primary);
+}
+
+.google-btn:active:not(:disabled) {
+  background: var(--gold-dim);
+}
+
+.google-btn img { width: 18px; height: 18px; }
+
+/* ── Terms ── */
+.terms {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  margin-top: 22px;
+  line-height: 1.65;
+  font-weight: 300;
+  transition: color 0.35s;
+}
+
+/* ── Messages ── */
+.error-message {
+  background: var(--error-bg);
+  color: var(--error-color);
+  border: 1px solid var(--error-border);
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.84rem;
+  text-align: center;
+}
+
+.success-message {
+  background: var(--success-bg);
+  color: var(--success-color);
+  border: 1px solid var(--success-border);
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.84rem;
+  text-align: center;
+}
+
+/* ── Mobile ── */
+@media (max-width: 480px) {
+  .login-container {
+    padding: 0;
+    align-items: flex-start;
+  }
+
+  .login-card {
+    border-radius: 0;
+    min-height: 100vh;
+    max-width: 100%;
+    padding: 56px 24px 40px;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  /* hide corner decorations on full-bleed mobile */
+  .card-corner-tr,
+  .card-corner-bl {
+    display: none;
+  }
+
+  .form-logo { font-size: 1.9rem; }
+  .form-subtitle { margin-bottom: 28px; }
+  .mode-toggle { margin-bottom: 24px; }
+
+  /* Push google btn + terms to bottom on mobile */
+  .terms { margin-top: 20px; }
+}
+
+/* Slightly larger phones in landscape */
+@media (max-width: 480px) and (orientation: landscape) {
+  .login-container {
+    align-items: center;
+  }
+  .login-card {
+    min-height: auto;
+    border-radius: 0;
+    padding: 32px 24px;
+  }
+}
+
+/* Tablet: card with more breathing room */
+@media (min-width: 481px) and (max-width: 768px) {
+  .login-card {
+    max-width: 400px;
+    padding: 40px 36px;
+  }
+}
+/* ── Error shake animation ── */
+@keyframes shakeIn {
+  0%   { transform: translateX(0);    opacity: 0; }
+  15%  { transform: translateX(-6px); opacity: 1; }
+  30%  { transform: translateX(6px);  }
+  45%  { transform: translateX(-4px); }
+  60%  { transform: translateX(4px);  }
+  75%  { transform: translateX(-2px); }
+  100% { transform: translateX(0);    opacity: 1; }
+}

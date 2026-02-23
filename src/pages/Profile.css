@@ -1,0 +1,305 @@
+/* Pacifico for the live signature preview */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=DM+Sans:wght@300;400;500&family=Pacifico&display=swap');
+
+.profile-page {
+  padding: 40px 40px 100px;
+  min-height: 100vh;
+  background: var(--bg, #0a0a0f);
+  animation: pageIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Header ── */
+.profile__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.profile__eyebrow {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold, #c9a96e);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.profile__eyebrow::before {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 1px;
+  background: var(--gold, #c9a96e);
+}
+.profile__title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  font-weight: 500;
+  color: var(--text-primary, #f0ece4);
+  letter-spacing: -0.02em;
+  margin: 0 0 4px;
+  line-height: 1.1;
+}
+.profile__subtitle {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.875rem;
+  color: var(--text-muted, #4e4b63);
+  margin: 0;
+}
+.profile__header-right { display: flex; align-items: flex-start; padding-top: 4px; }
+.profile__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.profile__badge--ok  { background: rgba(112,196,154,0.1); border: 1px solid rgba(112,196,154,0.3); color: #70c49a; }
+.profile__badge--new { background: rgba(224,170,80,0.1);  border: 1px solid rgba(224,170,80,0.3);  color: #e0aa50; }
+
+/* ── Google banner ── */
+.profile__google-banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  background: var(--card, #14141c);
+  border: 1px solid var(--border, rgba(201,169,110,0.18));
+  border-radius: 12px;
+  margin-bottom: 24px;
+}
+.profile__google-avatar {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: rgba(201,169,110,0.15);
+  border: 2px solid rgba(201,169,110,0.25);
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  color: var(--gold, #c9a96e);
+}
+.profile__google-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.profile__google-name  { font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500; color: var(--text-primary, #f0ece4); }
+.profile__google-email { font-family: 'DM Sans', sans-serif; font-size: 0.78rem; color: var(--text-muted, #4e4b63); margin-top: 2px; }
+.profile__google-label {
+  margin-left: auto;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.72rem;
+  color: var(--text-muted, #4e4b63);
+  padding: 4px 10px;
+  background: rgba(201,169,110,0.06);
+  border: 1px solid rgba(201,169,110,0.15);
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+/* ── Groups ── */
+.profile__groups { display: flex; flex-direction: column; gap: 20px; }
+
+.profile__group {
+  background: var(--card, #14141c);
+  border: 1px solid var(--border, rgba(201,169,110,0.18));
+  border-radius: 16px;
+  overflow: hidden;
+}
+.profile__group-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border, rgba(201,169,110,0.18));
+}
+.profile__group-header svg { color: var(--gold, #c9a96e); flex-shrink: 0; }
+.profile__group-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-primary, #f0ece4);
+  margin: 0;
+}
+.profile__group-body { padding: 20px 24px; }
+
+/* ── Grid ── */
+.profile__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 640px) { .profile__grid { grid-template-columns: 1fr; } }
+
+.profile__field { display: flex; flex-direction: column; gap: 7px; }
+.profile__field--full { grid-column: 1 / -1; }
+
+.profile__label {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted, #4e4b63);
+}
+.profile__req { color: var(--gold, #c9a96e); margin-left: 2px; }
+
+.profile__input,
+.profile__textarea {
+  padding: 11px 14px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border, rgba(201,169,110,0.18));
+  border-radius: 9px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.92rem;
+  color: var(--text-primary, #f0ece4);
+  outline: none;
+  transition: all 0.2s ease;
+  -webkit-appearance: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+.profile__input::placeholder,
+.profile__textarea::placeholder { color: var(--text-muted, #4e4b63); }
+.profile__input:focus,
+.profile__textarea:focus {
+  border-color: var(--gold, #c9a96e);
+  background: rgba(201,169,110,0.06);
+  box-shadow: 0 0 0 3px rgba(201,169,110,0.07);
+}
+.profile__textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+
+/* ── Hint text (FSSAI note, signatory note) ── */
+.profile__field-hint {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.72rem;
+  color: var(--text-muted, #4e4b63);
+  line-height: 1.5;
+  margin-top: -2px;
+}
+
+/* ── Signature preview ── */
+.profile__sig-preview {
+  margin-top: 6px;
+  padding: 14px 16px;
+  background: rgba(201,169,110,0.04);
+  border: 1px solid rgba(201,169,110,0.15);
+  border-radius: 10px;
+}
+/* White "paper" strip that mimics the invoice footer */
+.profile__sig-paper {
+  display: inline-block;
+  background: #ffffff;
+  border-radius: 5px;
+  padding: 8px 20px 4px;
+  border-bottom: 1.5px solid #555;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.18);
+  min-width: 200px;
+}
+/* Pacifico — handwriting-style cursive font */
+.profile__sig-text {
+  font-family: 'Pacifico', cursive;
+  font-size: 1.6rem;
+  color: #1a1a1a;
+  line-height: 1.5;
+  display: block;
+  white-space: nowrap;
+}
+.profile__sig-caption {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.68rem;
+  color: var(--text-muted, #4e4b63);
+  margin: 8px 0 0;
+  letter-spacing: 0.04em;
+}
+
+/* ── Save bar ── */
+.profile__save-bar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--card, #14141c);
+  border-top: 1px solid var(--border, rgba(201,169,110,0.18));
+  padding: 14px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  z-index: 50;
+  backdrop-filter: blur(12px);
+}
+.profile__save-hint {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.78rem;
+  color: var(--text-muted, #4e4b63);
+  flex: 1;
+  display: none;
+}
+@media (min-width: 640px) { .profile__save-hint { display: block; } }
+
+.profile__save-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 24px;
+  background: var(--gold, #c9a96e);
+  border: none;
+  border-radius: 10px;
+  color: #0a0808;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  white-space: nowrap;
+}
+.profile__save-btn:hover:not(:disabled) {
+  background: #e8d5b0;
+  box-shadow: 0 8px 24px rgba(201,169,110,0.28);
+}
+.profile__save-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Skeleton ── */
+.profile__skeleton { display: flex; flex-direction: column; gap: 20px; }
+.profile__skeleton-card {
+  height: 180px;
+  background: var(--card, #14141c);
+  border: 1px solid var(--border, rgba(201,169,110,0.18));
+  border-radius: 16px;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+@keyframes shimmer { 0%,100%{opacity:.4} 50%{opacity:.7} }
+
+/* ── Toast ── */
+.toast-container { position: fixed; bottom: 80px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+.toast { display: flex; align-items: center; gap: 10px; padding: 12px 18px; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 0.875rem; box-shadow: 0 8px 24px rgba(0,0,0,0.3); animation: toastIn 0.3s cubic-bezier(0.16,1,0.3,1) both; }
+@keyframes toastIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
+.toast--success { background: rgba(112,196,154,0.15); border: 1px solid rgba(112,196,154,0.3); color: #70c49a; }
+.toast--error   { background: rgba(224,112,112,0.12); border: 1px solid rgba(224,112,112,0.25); color: #e07070; }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .profile-page { padding: 16px 14px 100px; }
+  .profile__title { font-size: 1.5rem; }
+  .profile__group { border-radius: 12px; }
+  .profile__group-header { padding: 14px 18px; }
+  .profile__group-body { padding: 16px 18px; }
+  .profile__grid { grid-template-columns: 1fr; gap: 14px; }
+  .profile__save-bar { padding: 12px 14px; }
+  .profile__google-banner { padding: 14px 16px; gap: 12px; }
+  .profile__google-label { display: none; }
+  .profile__header { flex-direction: column; align-items: flex-start; }
+  .profile__sig-paper { min-width: 140px; }
+  .profile__sig-text { font-size: 1.3rem; }
+}
+@media (max-width: 420px) {
+  .profile-page { padding: 12px 10px 100px; }
+  .profile__input, .profile__textarea { font-size: 0.875rem; padding: 10px 12px; }
+}

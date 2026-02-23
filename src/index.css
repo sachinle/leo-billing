@@ -1,0 +1,66 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+:root {
+  font-family: 'DM Sans', sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Prevent system color-scheme from overriding our theme */
+  color-scheme: only dark;
+}
+
+/* Let our Login component's [data-theme] handle colors */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  min-width: 320px;
+}
+
+body {
+  display: block; /* <-- NOT flex — let Login.css handle its own layout */
+}
+
+/* Reset any browser defaults that could push things off-center */
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+}
+
+a {
+  font-weight: 500;
+  color: #c9a96e;
+  text-decoration: none;
+}
+a:hover {
+  color: #e8d5b0;
+}
+
+/* Global button reset — Login.css handles its own buttons */
+button {
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+}
+
+/* Scrollbar styling for dark mode */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(201, 169, 110, 0.2);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(201, 169, 110, 0.4);
+}

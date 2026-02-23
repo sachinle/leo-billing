@@ -1,0 +1,326 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap');
+
+.invoices {
+  padding: 40px 40px 60px;
+  min-height: 100vh;
+  background: var(--bg, #0a0a0f);
+  animation: pageIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+  transition: background 0.35s;
+}
+@keyframes pageIn { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+
+.invoices__header {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  margin-bottom: 32px; flex-wrap: wrap; gap: 16px;
+}
+.invoices__eyebrow {
+  font-size: 0.7rem; font-weight: 500; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--gold, #c9a96e);
+  margin-bottom: 4px; display: flex; align-items: center; gap: 10px;
+}
+.invoices__eyebrow::before { content:''; display:block; width:24px; height:1px; background:var(--gold,#c9a96e); }
+.invoices__title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.8rem, 3vw, 2.4rem); font-weight: 500;
+  color: var(--text-primary, #f0ece4); letter-spacing: -0.02em; margin: 0; line-height: 1.1;
+  transition: color 0.35s;
+}
+.invoices__create-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 11px 20px; background: var(--gold, #c9a96e);
+  border: none; border-radius: 10px; color: #0a0808;
+  font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 0.875rem;
+  cursor: pointer; transition: all 0.22s ease;
+  white-space: nowrap; text-decoration: none; position: relative; overflow: hidden;
+}
+.invoices__create-btn::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.15) 0%,transparent 60%); pointer-events:none;
+}
+.invoices__create-btn:hover { background:#e8d5b0; box-shadow:0 6px 20px rgba(201,169,110,0.28); transform:translateY(-1px); }
+
+/* Stats */
+.invoices__stats { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:28px; }
+@media (max-width:900px){ .invoices__stats{ grid-template-columns:repeat(2,1fr); } }
+.istat {
+  background:var(--card,#14141c); border:1px solid var(--border,rgba(201,169,110,0.18));
+  border-radius:12px; padding:18px 20px; transition:border-color 0.2s,transform 0.2s,background 0.35s;
+}
+.istat:hover{ border-color:rgba(201,169,110,0.35); transform:translateY(-2px); }
+.istat__label { font-size:0.68rem; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-muted,#4e4b63); margin-bottom:6px; transition:color 0.35s; }
+.istat__value { font-family:'Playfair Display',serif; font-size:1.4rem; color:var(--text-primary,#f0ece4); letter-spacing:-0.02em; line-height:1; transition:color 0.35s; }
+
+/* Toolbar */
+.invoices__toolbar { display:flex; align-items:center; gap:12px; margin-bottom:16px; flex-wrap:wrap; }
+.invoices__search-wrap { position:relative; display:flex; align-items:center; flex:1; max-width:360px; }
+.invoices__search-wrap>svg { position:absolute; left:14px; color:var(--text-muted,#4e4b63); pointer-events:none; }
+.invoices__search {
+  width:100%; padding:11px 40px;
+  background:var(--card,#14141c); border:1px solid var(--border,rgba(201,169,110,0.18));
+  border-radius:10px; font-family:'DM Sans',sans-serif; font-size:0.9rem;
+  color:var(--text-primary,#f0ece4); outline:none; transition:all 0.2s ease;
+}
+.invoices__search::placeholder{ color:var(--text-muted,#4e4b63); }
+.invoices__search:focus{ border-color:var(--gold,#c9a96e); background:rgba(201,169,110,0.06); box-shadow:0 0 0 3px rgba(201,169,110,0.07); }
+[data-theme="light"] .invoices__search { background:#ffffff; color:#1a1a1a; }
+.invoices__search-clear { position:absolute; right:12px; background:none; border:none; color:var(--text-muted,#4e4b63); cursor:pointer; display:flex; padding:4px; transition:color 0.2s; }
+.invoices__search-clear:hover{ color:var(--text-primary,#f0ece4); }
+.invoices__count { font-size:0.78rem; color:var(--text-muted,#4e4b63); margin-left:auto; white-space:nowrap; }
+
+/* Filter pills */
+.inv-filter-pill {
+  padding: 7px 14px; border-radius: 8px; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; font-size: 0.78rem; font-weight: 500;
+  border: 1px solid rgba(201,169,110,0.2); color: var(--text-muted, #4e4b63);
+  background: transparent; transition: all 0.18s; white-space: nowrap;
+}
+.inv-filter-pill:hover { border-color: rgba(201,169,110,0.35); color: var(--text-secondary,#8a8598); }
+.inv-filter-pill--active.inv-filter-pill--all    { border-color:rgba(201,169,110,0.6); color:var(--gold,#c9a96e); background:rgba(201,169,110,0.08); }
+.inv-filter-pill--active.inv-filter-pill--paid   { border-color:rgba(112,196,154,0.6); color:#70c49a; background:rgba(112,196,154,0.08); }
+.inv-filter-pill--active.inv-filter-pill--unpaid { border-color:rgba(224,170,80,0.6); color:#e0aa50; background:rgba(224,170,80,0.08); }
+
+/* Table */
+.invoices__table-wrap {
+  background:var(--card,#14141c); border:1px solid var(--border,rgba(201,169,110,0.18));
+  border-radius:16px; overflow:hidden; transition:background 0.35s,border-color 0.35s;
+}
+[data-theme="light"] .invoices__table-wrap { background: #ffffff; }
+
+.invoices__table { width:100%; border-collapse:collapse; font-family:'DM Sans',sans-serif; }
+.invoices__table thead tr { border-bottom:1px solid var(--border,rgba(201,169,110,0.18)); }
+.invoices__table th {
+  padding:13px 14px; font-size:0.67rem; font-weight:500; letter-spacing:0.1em;
+  text-transform:uppercase; color:var(--text-muted,#4e4b63); text-align:left; white-space:nowrap;
+  transition:color 0.35s; user-select:none;
+}
+.col-sortable { cursor: pointer; }
+.col-sortable:hover { color: var(--gold, #c9a96e); }
+.invoices__table tbody tr {
+  border-bottom:1px solid rgba(201,169,110,0.07); transition:background 0.15s;
+  animation:rowIn 0.35s cubic-bezier(0.16,1,0.3,1) both;
+}
+@keyframes rowIn { from{opacity:0;transform:translateX(-6px)} to{opacity:1;transform:translateX(0)} }
+.invoices__table tbody tr:last-child { border-bottom:none; }
+.invoices__table tbody tr:hover { background:rgba(201,169,110,0.04); }
+.invoices__table td { padding:12px 14px; font-size:0.875rem; color:var(--text-secondary,#8a8598); vertical-align:middle; transition:color 0.35s; }
+
+.inv-no { font-weight:500; color:var(--gold,#c9a96e); font-size:0.82rem; letter-spacing:0.04em; cursor:pointer; }
+.inv-no:hover { text-decoration:underline; }
+.inv-customer { font-weight:500; color:var(--text-primary,#f0ece4); font-size:0.875rem; transition:color 0.35s; }
+.inv-amount { font-family:'Playfair Display',serif; font-size:1rem; color:var(--text-primary,#f0ece4); transition:color 0.35s; }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   ACTION BUTTONS — DEFINITIVE FIX
+   
+   Root problem: old CSS used rgba() colors with very low alpha (0.2–0.3)
+   which made icons nearly invisible against both dark AND light backgrounds.
+   
+   This version uses SOLID colors for icons, with low-alpha for borders,
+   so icons are ALWAYS clearly visible regardless of theme.
+   ═══════════════════════════════════════════════════════════════════════ */
+.invoices__table .row-actions {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  flex-wrap: nowrap;
+  /* ensure icons always visible; other pages hide by default */
+  opacity: 1 !important;
+}
+
+/* Base button — all action buttons share this */
+.invoices__table .action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  border-radius: 6px;
+  border: 1px solid;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background: transparent;
+  flex-shrink: 0;
+  padding: 0;
+  line-height: 1;
+}
+
+/* ── VIEW (gold eye) ── */
+.invoices__table .action-btn--view {
+  border-color: rgba(201,169,110,0.4);
+  color: #c9a96e;                        /* solid gold — always visible */
+}
+.invoices__table .action-btn--view:hover {
+  background: rgba(201,169,110,0.15);
+  border-color: #c9a96e;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(201,169,110,0.2);
+}
+
+/* ── EDIT (silver pencil) ── */
+.invoices__table .action-btn--edit {
+  border-color: rgba(138,133,152,0.4);
+  color: #8a8598;                        /* solid muted — always visible */
+}
+.invoices__table .action-btn--edit:hover {
+  background: rgba(201,169,110,0.1);
+  border-color: rgba(201,169,110,0.5);
+  color: #c9a96e;
+  transform: translateY(-1px);
+}
+
+/* ── DUPLICATE (blue copy) ── */
+.invoices__table .action-btn--duplicate {
+  border-color: rgba(100,170,200,0.45);
+  color: #64aac8;                        /* solid blue — always visible */
+}
+.invoices__table .action-btn--duplicate:hover {
+  background: rgba(100,170,200,0.15);
+  border-color: #64aac8;
+  transform: translateY(-1px);
+}
+
+/* ── MARK PAID (green check) ── */
+.invoices__table .action-btn--paid {
+  border-color: rgba(112,196,154,0.5);
+  color: #70c49a;                        /* solid green — always visible */
+}
+.invoices__table .action-btn--paid:hover {
+  background: rgba(112,196,154,0.15);
+  border-color: #70c49a;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(112,196,154,0.2);
+}
+
+/* ── DELETE (red trash) ── */
+.invoices__table .action-btn--delete {
+  border-color: rgba(224,112,112,0.45);
+  color: #e07070;                        /* solid red — always visible */
+}
+.invoices__table .action-btn--delete:hover {
+  background: rgba(224,112,112,0.15);
+  border-color: #e07070;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(224,112,112,0.2);
+}
+
+/* Light mode adjustments for action buttons */
+[data-theme="light"] .action-btn--edit { color: #666; border-color: rgba(0,0,0,0.2); }
+[data-theme="light"] .action-btn--edit:hover { color: #333; border-color: rgba(0,0,0,0.4); }
+
+/* Empty state */
+.invoices__empty {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:12px; padding:80px 20px; color:var(--text-muted,#4e4b63); text-align:center;
+}
+.invoices__empty p{ font-size:0.9rem; font-weight:300; }
+.invoices__empty-btn {
+  display:flex; align-items:center; gap:8px; padding:10px 18px;
+  background:rgba(201,169,110,0.1); border:1px solid rgba(201,169,110,0.3);
+  border-radius:9px; color:var(--gold,#c9a96e);
+  font-family:'DM Sans',sans-serif; font-size:0.875rem; cursor:pointer; text-decoration:none; transition:all 0.2s;
+}
+.invoices__empty-btn:hover{ background:rgba(201,169,110,0.18); }
+
+/* Skeleton */
+.invoices__loading { padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+.invoices__skeleton-row {
+  height:52px; border-radius:8px;
+  background:rgba(201,169,110,0.06);
+  animation:shimmer 1.5s ease-in-out infinite;
+}
+@keyframes shimmer { 0%,100%{opacity:0.4} 50%{opacity:0.7} }
+
+/* Dialog */
+.dialog-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(3px); z-index:200; display:flex; align-items:center; justify-content:center; animation:fadeIn 0.2s ease; }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+.dialog { background:var(--card,#14141c); border:1px solid var(--border,rgba(201,169,110,0.18)); border-radius:16px; padding:32px; width:340px; max-width:calc(100vw - 40px); text-align:center; animation:dialogIn 0.25s cubic-bezier(0.16,1,0.3,1); box-shadow:0 24px 64px rgba(0,0,0,0.5); }
+[data-theme="light"] .dialog { background: #ffffff; }
+@keyframes dialogIn { from{opacity:0;transform:scale(0.94) translateY(10px)} to{opacity:1;transform:scale(1) translateY(0)} }
+.dialog__icon { width:48px; height:48px; border-radius:12px; background:rgba(224,112,112,0.1); border:1px solid rgba(224,112,112,0.25); color:#e07070; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; }
+.dialog__msg { font-size:0.875rem; color:var(--text-secondary,#8a8598); line-height:1.6; margin-bottom:24px; font-weight:300; }
+.dialog__actions { display:flex; gap:10px; }
+.dialog__cancel { flex:1; padding:11px; background:transparent; border:1px solid var(--border,rgba(201,169,110,0.2)); border-radius:8px; color:var(--text-secondary,#8a8598); font-family:'DM Sans',sans-serif; font-size:0.875rem; cursor:pointer; transition:all 0.2s; }
+.dialog__cancel:hover { border-color:var(--gold,#c9a96e); color:var(--text-primary,#f0ece4); }
+.dialog__confirm { flex:1; padding:11px; background:rgba(224,112,112,0.15); border:1px solid rgba(224,112,112,0.35); border-radius:8px; color:#e07070; font-family:'DM Sans',sans-serif; font-size:0.875rem; font-weight:500; cursor:pointer; transition:all 0.2s; }
+.dialog__confirm:hover { background:rgba(224,112,112,0.25); }
+
+/* Toast */
+.toast-container { position:fixed; bottom:24px; right:24px; z-index:300; display:flex; flex-direction:column; gap:8px; }
+.toast { display:flex; align-items:center; gap:10px; padding:12px 18px; border-radius:10px; font-family:'DM Sans',sans-serif; font-size:0.875rem; box-shadow:0 8px 24px rgba(0,0,0,0.3); animation:toastIn 0.3s cubic-bezier(0.16,1,0.3,1) both; }
+@keyframes toastIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
+.toast--success { background:rgba(112,196,154,0.15); border:1px solid rgba(112,196,154,0.3); color:#70c49a; }
+.toast--error   { background:rgba(224,112,112,0.12); border:1px solid rgba(224,112,112,0.25); color:#e07070; }
+
+/* Light mode stat cards */
+[data-theme="light"] .istat { background: #ffffff; }
+
+@media (max-width:768px) {
+  .invoices { padding:24px 16px 48px; }
+  .invoices__stats { grid-template-columns:repeat(2,1fr); }
+  .invoices__toolbar { flex-direction:column; align-items:stretch; }
+  .invoices__search-wrap { max-width:100%; }
+  .invoices__filter-select { width:100%; }
+  .invoices__count { margin-left:0; }
+
+  /* make table scrollable and shrink cells on mobile */
+  .invoices__table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .invoices__table th,
+  .invoices__table td {
+    padding: 8px 10px;
+    font-size: 0.75rem;
+  }
+}
+/* ══════════════════════════════════════════
+   MOBILE IMPROVEMENTS — Invoices
+══════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .invoices { padding: 16px 14px 60px; }
+
+  /* Stats: 2-col grid on mobile */
+  .invoices__stats { grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+  .istat { padding: 14px 16px; }
+  .istat__value { font-size: 1.25rem; }
+
+  /* Header */
+  .invoices__header { margin-bottom: 20px; gap: 12px; }
+  .invoices__title { font-size: 1.5rem; }
+  .invoices__create-btn { padding: 10px 14px; font-size: 0.82rem; }
+
+  /* Toolbar stack */
+  .invoices__toolbar { gap: 8px; }
+  .invoices__search-wrap { max-width: 100%; }
+  .invoices__count { font-size: 0.72rem; }
+
+  /* Filter pills wrap */
+  .inv-filter-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+  .inv-filter-pill { padding: 6px 12px; font-size: 0.74rem; }
+
+  /* Table: horizontal scroll, compact cells */
+  .invoices__table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 12px; }
+  .invoices__table th,
+  .invoices__table td { padding: 10px 10px; font-size: 0.78rem; }
+
+  /* Hide less important columns on mobile */
+  .invoices__table .col-date,
+  .invoices__table .col-items { display: none; }
+
+  /* Action buttons: tighter on mobile */
+  .invoices__table .row-actions { gap: 3px; }
+  .invoices__table .action-btn { width: 26px; height: 26px; min-width: 26px; }
+
+  /* Amount: smaller serif */
+  .inv-amount { font-size: 0.9rem; }
+}
+
+@media (max-width: 480px) {
+  .invoices { padding: 12px 10px 60px; }
+  .invoices__stats { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .istat__value { font-size: 1.1rem; }
+
+  /* On very small screens, show only 3 action buttons */
+  .invoices__table .action-btn--duplicate { display: none; }
+}

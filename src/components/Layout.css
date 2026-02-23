@@ -1,0 +1,105 @@
+.layout {
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg, #0a0a0f);
+}
+
+.layout__overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(3px);
+  z-index: 98;
+  animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.layout__main {
+  flex: 1;
+  min-width: 0;
+  transition: margin-left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Mobile Topbar ── */
+.layout__topbar {
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  /* 3-layer fallback for status bar height:
+     1. env(safe-area-inset-top) — works when viewport-fit=cover + overlay enabled
+     2. var(--status-bar-height) — set by safeArea.js via Capacitor StatusBar API
+     3. 28px — hardcoded sensible default for Android phones              */
+  padding-top: max(env(safe-area-inset-top, 0px), var(--status-bar-height, 28px));
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-bottom: 0;
+  height: calc(56px + max(env(safe-area-inset-top, 0px), var(--status-bar-height, 28px)));
+  background: var(--card, #14141c);
+  border-bottom: 1px solid var(--border, rgba(201, 169, 110, 0.18));
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* Inner content row is always 56px tall, sitting below the status bar zone */
+.layout__topbar > * {
+  height: 56px;
+  display: flex;
+  align-items: center;
+}
+
+.layout__topbar-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: var(--text-primary, #f0ece4);
+  letter-spacing: -0.01em;
+}
+
+.layout__topbar-dot {
+  color: var(--gold, #c9a96e);
+}
+
+.layout__hamburger {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid var(--border, rgba(201, 169, 110, 0.2));
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.layout__hamburger:hover {
+  border-color: var(--gold, #c9a96e);
+  background: rgba(201, 169, 110, 0.06);
+}
+.layout__hamburger span {
+  display: block;
+  width: 18px;
+  height: 1.5px;
+  background: var(--text-primary, #f0ece4);
+  border-radius: 2px;
+  transition: all 0.3s;
+}
+
+@media (min-width: 769px) {
+  .layout__topbar { display: none; }
+}
+
+/* Light mode */
+[data-theme="light"] .layout__topbar {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(180, 140, 80, 0.2);
+}
+[data-theme="light"] .layout__main {
+  background: #f5f5f8;
+}

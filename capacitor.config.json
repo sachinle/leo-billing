@@ -1,0 +1,16 @@
+{
+  "appId": "com.leocrop.leobilling",
+  "appName": "Leo Billing",
+  "webDir": "dist",
+  "plugins": {
+    "FirebaseAuthentication": {
+      "skipNativeAuth": false,
+      "providers": ["google.com"]
+    },
+    "StatusBar": {
+      "overlaysWebView": true,
+      "style": "DARK",
+      "backgroundColor": "#14141c"
+    }
+  }
+}
