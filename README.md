@@ -44,7 +44,7 @@ So I built **Leo Billing** — a modern, full-stack invoicing system built speci
 
 | Create Invoice | View Invoice |
 |:--------------:|:------------:|
-| ![Create](screenshots/web-create-invoice-1.png) | ![View](screenshots/view-invoice.png) |
+| ![Create](screenshots/web-create-invoice.png) | ![View](screenshots/web-invoice-exp2.png) |
 
 | Dark Mode | Share / Export |
 |:---------:|:--------------:|
