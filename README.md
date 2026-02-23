@@ -7,7 +7,7 @@
 ### Home Business Invoicing — Simple, Fast, Unlimited
 
 [![Live Demo](https://img.shields.io/badge/🌐%20Live%20Demo-leo--billing.vercel.app-c9a96e?style=for-the-badge)](https://leo-billing.vercel.app/)
-[![Download APK](https://img.shields.io/badge/📲%20Download%20APK-Latest%20Release-3ddc84?style=for-the-badge)](https://github.com/yourusername/leo-billing/releases/latest)
+[![Download APK](https://img.shields.io/badge/📲%20Download%20APK-Latest%20Release-3ddc84?style=for-the-badge)](https://github.com/sachinle/leo-billing/releases/latest)
 [![React](https://img.shields.io/badge/React-19-61dafb?style=flat-square&logo=react)](https://react.dev)
 [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ecf8e?flat-square&logo=supabase)](https://supabase.com)
 [![Capacitor](https://img.shields.io/badge/Capacitor-Android-119eff?flat-square&logo=capacitor)](https://capacitorjs.com)
@@ -31,12 +31,12 @@ So I built **Leo Billing** — a modern, full-stack invoicing system built speci
 
 ---
 
-## 📸 Screenshots
-
-> **Add your screenshots here!**
-> See the [Screenshots Guide](#-how-to-add-screenshots) section below for step-by-step instructions.
+## 📸 Screenshots (Web)
 
 <!-- SCREENSHOTS START — replace the placeholder rows below with your actual images -->
+| Login | Customers Details |
+|:--------------:|:------------:|
+| ![Login](screenshots/web-login.png) | ![Customers](screenshots/web-customers.png) |
 
 | Dashboard | Invoices |
 |:---------:|:--------:|
@@ -46,9 +46,48 @@ So I built **Leo Billing** — a modern, full-stack invoicing system built speci
 |:--------------:|:------------:|
 | ![Create](screenshots/web-create-invoice.png) | ![View](screenshots/web-invoice-exp2.png) |
 
+
 | Dark Mode | Share / Export |
 |:---------:|:--------------:|
 | ![Dark](screenshots/dark-mode.png) | ![Share](screenshots/web-invoice-exp2.png) |
+
+| Settings | Profile |
+|:---------:|:--------------:|
+| ![Settings](screenshots/web-settings.png) | ![Profile](screenshots/web-settings.png) |
+
+<!-- SCREENSHOTS END -->
+
+## 📸 Screenshots (Mobile)
+
+<!-- SCREENSHOTS START — replace the placeholder rows below with your actual images -->
+| Mobile App | Google Account Signin |
+|:--------------:|:------------:|
+| ![Login](screenshots/mobile-app.jpg) | ![Customers](screenshots/mobile-google-acc-login.jpg) |
+
+| Login | Customers Details |
+|:--------------:|:------------:|
+| ![Login](screenshots/mobile-login.jpg) | ![Customers](screenshots/mobile-customers-details.jpg) |
+
+| Dashboard | Invoices |
+|:---------:|:--------:|
+| ![Dashboard](screenshots/mobile-dashboard.jpg) | ![Invoices](screenshots/mobile-invoices.jpg) |
+
+| Create Invoice | View Invoice |
+|:--------------:|:------------:|
+| ![Create](screenshots/mobile-create-invoice.jpg) | ![View](screenshots/mobile-invoice-view.jpg) |
+
+| Product | Invoice Download |
+|:--------------:|:------------:|
+| ![Create](screenshots/mobile-product.jpg) | ![View](screenshots/mobile-invoice-download.jpg) |
+
+| Dark Mode | Share / Export |
+|:---------:|:--------------:|
+| ![Dark](screenshots/mobile-dark-mode.jpg) | ![Share](screenshots/mobile-share.jpg) |
+
+| Profile Edit P1 | Profile Edit P2|
+|:---------:|:--------------:|
+| ![Settings](screenshots/mobile-profile-1.jpg) | ![Profile](screenshots/mobile-profile-2.jpg) |
+
 
 <!-- SCREENSHOTS END -->
 
