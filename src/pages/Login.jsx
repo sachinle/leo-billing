@@ -38,7 +38,7 @@ export default function Login() {
   const friendlyError = (err) => {
     // Access denied — not in allowlist
     if (err?.code === 'ACCESS_DENIED' || err?.message === 'ACCESS_DENIED')
-      return '🔒 Access denied. Only authorised accounts are allowed to use this app.';
+      return 'Access denied. Only authorised accounts are allowed to use this app.';
     switch (err?.code) {
       case 'auth/user-not-found':
       case 'auth/invalid-credential':

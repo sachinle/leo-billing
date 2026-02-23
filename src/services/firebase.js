@@ -27,7 +27,8 @@ const googleProvider = new GoogleAuthProvider();
 export const ALLOWED_EMAILS = [
   "sachinimmanuel2006@gmail.com",
   "sachinannie172@gmail.com",
-  "sanjayantonio4@gmail.com"
+  "sanjayantonio4@gmail.com",
+  "apptest123@gmail.com"
 ];
 export const isAllowed = (email) => ALLOWED_EMAILS.includes(email);
 // ─────────────────────────────────────────────────────────────────────────────
