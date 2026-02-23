@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { useAuth } from './hooks/useAuth';
 import PullToRefresh from './components/PullToRefresh';
+import { useBackButton } from './hooks/useBackButton';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 import Login from './pages/Login';
@@ -17,6 +18,7 @@ import Settings from './pages/Settings';
 
 function AppRoutes() {
   const { user, loading } = useAuth();
+  useBackButton(); // intercept Android hardware back button
 
   // Show spinner while Firebase resolves auth state on startup.
   // This prevents the login flash and the immediate redirect-back-to-login bug.

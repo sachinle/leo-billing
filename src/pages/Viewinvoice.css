@@ -470,6 +470,8 @@
   .vi__mobile-view {
     display: block;
     animation: mobileIn 0.4s cubic-bezier(0.16,1,0.3,1) both;
+    /* Push content up so nothing hides behind the fixed bottom bar + virtual nav */
+    padding-bottom: calc(64px + env(safe-area-inset-bottom, 16px) + 16px);
   }
 
   /* Hide the A4 receipt off-screen on mobile
@@ -512,8 +514,9 @@
     position: fixed;      /* viewport-fixed: stays put while page scrolls */
     bottom: 0; left: 0; right: 0;
     z-index: 9999;        /* must be above everything */
-    height: 64px;
-    padding-bottom: env(safe-area-inset-bottom, 0px);
+    /* Height = 64px buttons + virtual nav bar height */
+    height: calc(64px + env(safe-area-inset-bottom, 16px));
+    padding-bottom: env(safe-area-inset-bottom, 16px);
     background: var(--card, #14141c);
     border-top: 1px solid rgba(201,169,110,0.25);
     box-shadow: 0 -8px 32px rgba(0,0,0,0.4);
