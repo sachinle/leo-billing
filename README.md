@@ -66,7 +66,7 @@ So I built **Leo Billing** — a modern, full-stack invoicing system built speci
 
 | Login | Customers Details |
 |:--------------:|:------------:|
-| ![Login](screenshots/mobile-login.jpg) | ![Customers](screenshots/mobile-customers-details.jpg) |
+| ![Login](screenshots/moibile-login.jpg) | ![Customers](screenshots/mobile-customers-details.jpg) |
 
 | Dashboard | Invoices |
 |:---------:|:--------:|
