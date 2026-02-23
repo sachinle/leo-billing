@@ -7,7 +7,7 @@
 ### Home Business Invoicing — Simple, Fast, Unlimited
 
 [![Live Demo](https://img.shields.io/badge/🌐%20Live%20Demo-leo--billing.vercel.app-c9a96e?style=for-the-badge)](https://leo-billing.vercel.app/)
-[![Download APK](https://img.shields.io/badge/📲%20Download%20APK-Latest%20Release-3ddc84?style=for-the-badge)](https://github.com/sachinle/leo-billing/releases/latest/leobilling.apk)
+[![Download APK](https://img.shields.io/badge/📲%20Download%20APK-Latest%20Release-3ddc84?style=for-the-badge)](https://github.com/sachinle/leo-billing/releases/latest/leo-billing.apk)
 [![React](https://img.shields.io/badge/React-19-61dafb?style=flat-square&logo=react)](https://react.dev)
 [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ecf8e?flat-square&logo=supabase)](https://supabase.com)
 [![Capacitor](https://img.shields.io/badge/Capacitor-Android-119eff?flat-square&logo=capacitor)](https://capacitorjs.com)
@@ -403,7 +403,7 @@ USING (user_id = auth.uid()::text);
 
 ## 📲 Installing the APK on Android
 
-1. Download the latest APK from [Releases](https://github.com/sachinle/leo-billing/releases/latest/leobilling.apk)
+1. Download the latest APK from [Releases](https://github.com/sachinle/leo-billing/releases/latest/leo-billing.apk)
 2. Open the APK file on your Android device
 3. If prompted, tap **"Install from unknown sources"** and allow it
 4. Install and open **Leo Billing**
