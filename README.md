@@ -193,6 +193,212 @@ src/
 ```
 
 ---
+---
+
+## 🗄️ Database Structure
+
+Leo Billing uses **Supabase (PostgreSQL)** as its backend. Each table is scoped by `user_id` (Firebase UID), ensuring complete data isolation between users.
+
+---
+
+### Schema Overview
+
+```
+business_profiles   ← one profile per user (shop details, bank info)
+customers           ← customer directory per user
+products            ← product catalog per user
+invoices            ← invoice headers per user
+invoice_items       ← line items linked to each invoice
+```
+
+---
+
+### Tables
+
+#### `business_profiles`
+Stores the shop/business details shown on invoices.
+
+| Column | Type | Description |
+|---|---|---|
+| `id` | int8 | Primary key |
+| `user_id` | text | Firebase UID (unique per user) |
+| `shop_name` | text | Business name |
+| `owner_name` | text | Owner full name |
+| `phone` | text | Contact number |
+| `email` | text | Business email |
+| `address`, `city`, `state`, `pincode` | text | Address fields |
+| `gstin` | text | GST identification number |
+| `fssai_no` | text | FSSAI license number |
+| `upi_id` | text | UPI payment ID |
+| `bank_name`, `account_no`, `ifsc_code` | text | Bank details |
+| `signatory_name` | text | Name on invoice signature |
+| `terms` | text | Invoice terms & conditions |
+| `created_at`, `updated_at` | timestamptz | Timestamps |
+
+---
+
+#### `customers`
+Customer directory with auto-tracked purchase totals.
+
+| Column | Type | Description |
+|---|---|---|
+| `id` | int8 | Primary key |
+| `user_id` | text | Firebase UID |
+| `name` | text | Customer name |
+| `phone` | text | Phone number |
+| `email` | text | Email (optional) |
+| `address` | text | Address (optional) |
+| `total_purchase` | numeric | Cumulative purchase value |
+| `created_at` | timestamptz | Record creation timestamp |
+
+---
+
+#### `products`
+Product/item catalog used for quick invoice entry.
+
+| Column | Type | Description |
+|---|---|---|
+| `id` | int8 | Primary key |
+| `user_id` | text | Firebase UID |
+| `name` | text | Product name |
+| `description` | text | Optional description |
+| `price` | numeric | Unit price |
+| `unit` | text | Unit of measure (kg, pcs, etc.) |
+| `stock` | int4 | Stock count |
+| `category` | text | Product category |
+| `gst_rate` | numeric | GST percentage |
+| `created_at` | timestamptz | Record creation timestamp |
+
+---
+
+#### `invoices`
+Invoice headers — one row per invoice.
+
+| Column | Type | Description |
+|---|---|---|
+| `id` | int8 | Primary key |
+| `user_id` | text | Firebase UID |
+| `invoice_no` | text | Auto-generated invoice number |
+| `date` | date | Invoice date |
+| `time` | text | Invoice time |
+| `customer_id` | int8 | FK → `customers.id` |
+| `customer_name` | text | Denormalized customer name |
+| `customer_phone` | text | Denormalized customer phone |
+| `subtotal` | numeric | Sum before discounts |
+| `discount_total` | numeric | Total discount applied |
+| `final_amount` | numeric | Amount after discounts |
+| `amount_due` | numeric | Remaining unpaid amount |
+| `payment_status` | text | `paid` or `unpaid` |
+| `created_at` | timestamptz | Record creation timestamp |
+
+---
+
+#### `invoice_items`
+Line items for each invoice — supports both catalog products and ad-hoc entries.
+
+| Column | Type | Description |
+|---|---|---|
+| `id` | int8 | Primary key |
+| `user_id` | text | Firebase UID |
+| `invoice_id` | int8 | FK → `invoices.id` |
+| `product_id` | int8 | FK → `products.id` (nullable for ad-hoc items) |
+| `product_name` | text | Item name (denormalized) |
+| `quantity` | numeric | Quantity |
+| `unit` | text | Unit of measure |
+| `price` | numeric | Unit price |
+| `discount` | numeric | Per-item discount |
+| `total` | numeric | Line total (`quantity × price − discount`) |
+
+---
+
+### Key Queries
+
+**Fetch all invoices for the logged-in user:**
+```sql
+SELECT *
+FROM invoices
+WHERE user_id = $1
+ORDER BY created_at DESC;
+```
+
+**Fetch invoice with all line items:**
+```sql
+SELECT
+  i.*,
+  ii.product_name,
+  ii.quantity,
+  ii.unit,
+  ii.price,
+  ii.discount,
+  ii.total
+FROM invoices i
+JOIN invoice_items ii ON ii.invoice_id = i.id
+WHERE i.id = $1 AND i.user_id = $2;
+```
+
+**Dashboard — total revenue and outstanding amount:**
+```sql
+SELECT
+  SUM(final_amount)  AS total_revenue,
+  SUM(amount_due)    AS total_outstanding,
+  COUNT(*)           AS total_invoices
+FROM invoices
+WHERE user_id = $1;
+```
+
+**Today's sales:**
+```sql
+SELECT SUM(final_amount) AS today_revenue
+FROM invoices
+WHERE user_id = $1
+  AND date = CURRENT_DATE;
+```
+
+**Top customers by purchase value:**
+```sql
+SELECT name, phone, total_purchase
+FROM customers
+WHERE user_id = $1
+ORDER BY total_purchase DESC
+LIMIT 5;
+```
+
+**Search invoices by customer name or invoice number:**
+```sql
+SELECT *
+FROM invoices
+WHERE user_id = $1
+  AND (
+    customer_name ILIKE '%' || $2 || '%'
+    OR invoice_no  ILIKE '%' || $2 || '%'
+  )
+ORDER BY created_at DESC;
+```
+
+---
+
+### Row Level Security (RLS)
+
+All tables have RLS enabled. Each policy ensures a user can only read and write their own rows:
+
+```sql
+-- Example policy (applied to all tables)
+CREATE POLICY "Users can access own data"
+ON invoices
+FOR ALL
+USING (user_id = auth.uid()::text);
+```
+
+> **Note:** `auth.uid()` is cast to `text` to match the Firebase UID stored as a text field.
+
+---
+## 📸 Screenshots (DB)
+
+<!-- SCREENSHOTS START — replace the placeholder rows below with your actual images -->
+| Schema Visulizer |
+|:--------------:|
+| ![Schema](screenshots/schema-visual.png) |
+
 
 
 ## 📲 Installing the APK on Android
