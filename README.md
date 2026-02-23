@@ -403,7 +403,7 @@ USING (user_id = auth.uid()::text);
 
 ## 📲 Installing the APK on Android
 
-1. Download the latest APK from [Releases](https://github.com/yourusername/leo-billing/releases/latest)
+1. Download the latest APK from [Releases](https://github.com/sachinle/leo-billing/releases/latest/leobilling.apk)
 2. Open the APK file on your Android device
 3. If prompted, tap **"Install from unknown sources"** and allow it
 4. Install and open **Leo Billing**
