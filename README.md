@@ -168,5 +168,4 @@ src/
 ## 🤝 Contributing
 
 Contributions, issues and feature requests are welcome! Feel free to open an [issue](https://github.com/sachinle/leo-billing/issues) or submit a pull request.
-(https://canva.com) or [remove.bg](https://remove.bg) can help clean them up.
 
