@@ -40,11 +40,11 @@ So I built **Leo Billing** — a modern, full-stack invoicing system built speci
 
 | Dashboard | Invoices |
 |:---------:|:--------:|
-| ![Dashboard](screenshots/web-dashboard.png) | ![Invoices](screenshots/web-invoice-exp2.png) |
+| ![Dashboard](screenshots/web-dashboard.png) | ![Invoices](screenshots/web-invoices.png) |
 
 | Create Invoice | View Invoice |
 |:--------------:|:------------:|
-| ![Create](screenshots/web-create-invoice.png) | ![View](screenshots/view-invoice.png) |
+| ![Create](screenshots/web-create-invoice-1.png) | ![View](screenshots/view-invoice.png) |
 
 | Dark Mode | Share / Export |
 |:---------:|:--------------:|
