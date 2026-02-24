@@ -209,6 +209,7 @@
     min-width: 270px;
     z-index: 99;
     box-shadow: none;
+    padding-top: 0; /* header handles status bar on mobile */
   }
   .sidebar--mobile-open {
     transform: translateX(0);
@@ -217,7 +218,15 @@
 
   /* On mobile when open: always show full sidebar regardless of collapsed state */
   .sidebar--mobile-open { width: 270px; min-width: 270px; }
-  .sidebar--mobile-open .sidebar__header { justify-content: space-between; padding: 20px 16px 18px; }
+  .sidebar--mobile-open .sidebar__header {
+    justify-content: space-between;
+    /* Push logo/close below Android status bar.
+       --status-bar-height is set by safeArea.js; 40px is a safe hardcoded fallback. */
+    padding-top: max(var(--status-bar-height, 40px), 40px);
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-bottom: 18px;
+  }
   .sidebar--mobile-open .sidebar__logo { max-width: 200px; opacity: 1; }
   .sidebar--mobile-open .sidebar__nav { padding: 14px 10px; align-items: stretch; }
   .sidebar--mobile-open .sidebar__link { justify-content: flex-start; padding: 12px 14px; width: auto; gap: 14px; }

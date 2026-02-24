@@ -28,26 +28,24 @@
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  /* 3-layer fallback for status bar height:
-     1. env(safe-area-inset-top) — works when viewport-fit=cover + overlay enabled
-     2. var(--status-bar-height) — set by safeArea.js via Capacitor StatusBar API
-     3. 28px — hardcoded sensible default for Android phones              */
-  padding-top: max(env(safe-area-inset-top, 0px), var(--status-bar-height, 28px));
+  /* Status bar safe area — --status-bar-height is set by safeArea.js.
+     Fallback 40px is safe for virtually all Android devices.            */
+  padding-top: max(env(safe-area-inset-top, 0px), var(--status-bar-height, 40px));
   padding-left: 16px;
   padding-right: 16px;
   padding-bottom: 0;
-  height: calc(56px + max(env(safe-area-inset-top, 0px), var(--status-bar-height, 28px)));
+  height: calc(56px + max(env(safe-area-inset-top, 0px), var(--status-bar-height, 40px)));
   background: var(--card, #14141c);
   border-bottom: 1px solid var(--border, rgba(201, 169, 110, 0.18));
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
 }
 
-/* Inner content row is always 56px tall, sitting below the status bar zone */
+/* Items naturally sized — sit at bottom of topbar (below status bar zone) */
 .layout__topbar > * {
-  height: 56px;
   display: flex;
   align-items: center;
+  margin-bottom: 8px; /* 8px breathing room from bottom edge */
 }
 
 .layout__topbar-logo {
