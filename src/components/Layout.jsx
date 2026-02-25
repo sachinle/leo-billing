@@ -8,6 +8,8 @@ import Invoices from '../pages/Invoices';
 import CreateInvoice from '../pages/CreateInvoice';
 import EditInvoice from '../pages/EditInvoice';
 import ViewInvoice from '../pages/ViewInvoice';
+import ThermalPrint from '../pages/ThermalPrint';
+import PrinterSettings from '../pages/PrinterSettings';
 import Settings from '../pages/Settings';
 import Profile from '../pages/Profile';
 import './Layout.css';
@@ -83,7 +85,9 @@ export default function Layout() {
           <Route path="/invoices/create" element={<CreateInvoice />} />
           <Route path="/invoices/edit/:id" element={<EditInvoice />} />
           <Route path="/invoices/view/:id" element={<ViewInvoice />} />
+          <Route path="/invoices/view/:id/print" element={<ThermalPrint />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/printer" element={<PrinterSettings />} />
           <Route path="/profile" element={<Profile />} />
           {/* legacy compat */}
           <Route path="/create-invoice" element={<CreateInvoice />} />

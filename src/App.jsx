@@ -12,9 +12,11 @@ import Products from './pages/Products';
 import Invoices from './pages/Invoices';
 import CreateInvoice from './pages/CreateInvoice';
 import EditInvoice from './pages/EditInvoice';
+import ThermalPrint from './pages/ThermalPrint';
 import ViewInvoice from './pages/ViewInvoice';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
+import PrinterSettings from './pages/PrinterSettings';
 
 function AppRoutes() {
   const { user, loading } = useAuth();
@@ -62,10 +64,12 @@ function AppRoutes() {
         <Route path="products"           element={<Products />} />
         <Route path="invoices"           element={<Invoices />} />
         <Route path="create-invoice"     element={<CreateInvoice />} />
+        <Route path="/invoices/view/:id/print" element={<ThermalPrint />} />
         <Route path="invoices/view/:id"  element={<ViewInvoice />} />
         <Route path="invoices/edit/:id"  element={<EditInvoice />} />
         <Route path="profile"            element={<Profile />} />
         <Route path="settings"           element={<Settings />} />
+        <Route path="printer"            element={<PrinterSettings />} />
         <Route path="*"                  element={<Navigate to="/dashboard" replace />} />
       </Route>
 

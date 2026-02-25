@@ -396,6 +396,20 @@ export default function ViewInvoice() {
               />
             )}
           </div>
+
+          {/* ── Thermal Print button — visible on desktop too ── */}
+          <Link
+            to={`/invoices/view/${invoice?.id}/print`}
+            className="vi__action-btn vi__action-btn--print"
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="6,9 6,2 18,2 18,9"/>
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+              <rect x="6" y="14" width="12" height="8"/>
+            </svg>
+            Print
+          </Link>
+
         </div>
       </div>
 
@@ -770,12 +784,18 @@ export default function ViewInvoice() {
                     marginBottom: 4,
                   }} />
                   <div className="ir__sig-label">Authorized Signatory</div>
+                  <div className="ir__powered">
+                    <span className="ir__powered-text">
+                      Powered by Leo Billing<span className="ir__powered-dot">.</span>
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
         </div>
+
       </div>
 
     </div>
@@ -823,7 +843,7 @@ export default function ViewInvoice() {
 
       <div className="vi__mob-bar__div" />
 
-      {/* ── Share — Capacitor native share sheet (WhatsApp, Telegram, etc.) ── */}
+      {/* ── Share ── */}
       <button
         className={`vi__mob-btn${exporting === 'share' ? ' vi__mob-btn--busy' : ''}`}
         onClick={exporting ? undefined : handleShare}
@@ -837,6 +857,23 @@ export default function ViewInvoice() {
         </span>
         <span className="vi__mob-btn__label">{exporting === 'share' ? 'Sharing…' : 'Share'}</span>
       </button>
+
+      <div className="vi__mob-bar__div" />
+
+      {/* ── Thermal Print ── */}
+      <Link
+        to={`/invoices/view/${invoice?.id}/print`}
+        className="vi__mob-btn vi__mob-btn--print"
+      >
+        <span className="vi__mob-btn__icon vi__mob-btn__icon--print">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <polyline points="6,9 6,2 18,2 18,9"/>
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+            <rect x="6" y="14" width="12" height="8"/>
+          </svg>
+        </span>
+        <span className="vi__mob-btn__label">Print</span>
+      </Link>
 
     </div>
     </Fragment>

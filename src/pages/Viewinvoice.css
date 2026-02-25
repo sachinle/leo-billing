@@ -65,6 +65,8 @@
 .vi__action-btn--markpaid { background:rgba(112,196,154,0.1); border:1px solid rgba(112,196,154,0.3); color:#70c49a; }
 .vi__action-btn--markpaid:hover:not(:disabled) { background:rgba(112,196,154,0.18); border-color:rgba(112,196,154,0.5); transform:translateY(-1px); }
 .vi__action-btn--markpaid:disabled { opacity:0.5; cursor:not-allowed; }
+.vi__action-btn--print { background:transparent; border:1px solid rgba(201,169,110,0.3); color:var(--text-secondary,#8a8598); text-decoration:none; }
+.vi__action-btn--print:hover { border-color:var(--gold,#c9a96e); color:var(--gold,#c9a96e); background:rgba(201,169,110,0.06); }
 
 /* Profile warning */
 .vi__profile-warning {
@@ -624,3 +626,40 @@
 [data-theme="light"] .vi__totals-final { color: #1a1a1a; }
 [data-theme="light"] .vi__totals { background: rgba(201,169,110,0.04); }
 [data-theme="light"] .vi__card-head { background: rgba(201,169,110,0.06); }
+
+/* ── Print button in mobile bar ── */
+.vi__mob-btn--print {
+  text-decoration: none;
+  color: inherit;
+}
+.vi__mob-btn__icon--print {
+  background: rgba(201,169,110,0.10);
+  border: 1px solid rgba(201,169,110,0.28);
+  color: var(--gold, #c9a96e);
+}
+/* Print label colour */
+.vi__mob-btn--print .vi__mob-btn__label { color: var(--gold, #c9a96e); }
+[data-theme="light"] .vi__mob-btn--print .vi__mob-btn__label { color: #8a6930; }
+[data-theme="light"] .vi__mob-btn__icon--print {
+  background: rgba(201,169,110,0.12);
+  border-color: rgba(150,110,40,0.3);
+}
+
+/* Powered by Leo Billing — inside receipt, below Authorized Signatory */
+.ir__powered {
+  text-align: right;
+  padding-top: 6px;
+  margin-top: 2px;
+}
+.ir__powered-text {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-style: italic;
+  color: #be1b1b;
+  letter-spacing: 0.05em;
+  opacity: 0.9;
+}
+.ir__powered-dot { color: #be1b1b; font-style: normal; font-weight: 900; }
+[data-theme="light"] .ir__powered-text { color: #be1b1b; }
+[data-theme="light"] .ir__powered-dot  { color: #be1b1b; }
