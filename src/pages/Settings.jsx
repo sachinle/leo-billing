@@ -189,7 +189,7 @@ const handleCheckStorage = async () => {
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <polyline points="20,6 9,17 4,12"/>
             </svg>
-            Leo Billing v1.0.0
+            Leo Billing v2.0.0
           </div>
         </div>
 
