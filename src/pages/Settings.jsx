@@ -28,6 +28,8 @@ export default function Settings() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [toasts, setToasts] = useState([]);
+  const [storageInfo, setStorageInfo]   = useState(null);
+  const [loadingStorage, setLoadingStorage] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [exporting, setExporting] = useState(false);
 
@@ -98,6 +100,62 @@ export default function Settings() {
       setExporting(false);
     }
   };
+
+  // ── Storage estimator ────────────────────────────────────────────────────
+// Supabase free plan: 500 MB database storage
+// We estimate size by serializing each row to JSON and measuring byte length.
+const SUPABASE_FREE_LIMIT_BYTES = 500 * 1024 * 1024; // 500 MB
+
+const handleCheckStorage = async () => {
+  if (!user || loadingStorage) return;
+  setLoadingStorage(true);
+  try {
+    const [invoices, customers, products] = await Promise.all([
+      getInvoices(user.uid),
+      getCustomers(user.uid),
+      getProducts(user.uid),
+    ]);
+
+    // Estimate bytes used per table by JSON-serialising each row
+    const bytesOf = (arr) =>
+      arr.reduce((s, row) => s + new TextEncoder().encode(JSON.stringify(row)).length, 0);
+
+    const invBytes  = bytesOf(invoices);
+    const custBytes = bytesOf(customers);
+    const prodBytes = bytesOf(products);
+
+    // Each invoice also has ~3 items on average — fetch a sample to estimate item size
+    // For simplicity: estimate invoice_items as 2× invoice rows (items are roughly equal size)
+    const estimatedItemBytes = invBytes * 1.8;
+
+    const totalUsedBytes = invBytes + estimatedItemBytes + custBytes + prodBytes;
+    const usedMB         = totalUsedBytes / (1024 * 1024);
+    const limitMB        = SUPABASE_FREE_LIMIT_BYTES / (1024 * 1024);
+    const usedPct        = Math.min(100, (totalUsedBytes / SUPABASE_FREE_LIMIT_BYTES) * 100);
+    const remainingBytes = Math.max(0, SUPABASE_FREE_LIMIT_BYTES - totalUsedBytes);
+
+    // Estimate how many more invoices can be created
+    const avgInvBytes    = invoices.length > 0
+      ? (invBytes + estimatedItemBytes) / invoices.length
+      : 2048; // fallback: ~2 KB per invoice if no data yet
+    const moreInvoices   = Math.floor(remainingBytes / avgInvBytes);
+
+    setStorageInfo({
+      usedMB:       usedMB.toFixed(2),
+      limitMB,
+      usedPct:      usedPct.toFixed(1),
+      remainingMB:  (remainingBytes / (1024 * 1024)).toFixed(2),
+      invoiceCount: invoices.length,
+      moreInvoices: moreInvoices.toLocaleString('en-IN'),
+      custCount:    customers.length,
+      prodCount:    products.length,
+    });
+  } catch (err) {
+    addToast('Failed to estimate storage: ' + (err.message || 'Unknown'), 'error');
+  } finally {
+    setLoadingStorage(false);
+  }
+};
 
   const Row = ({ label, sub, children }) => (
     <div className="settings__row">
@@ -185,34 +243,107 @@ export default function Settings() {
         </div>
 
         {/* ── Data & Export (Enterprise feature) ── */}
-        <div className="settings__group">
-          <div className="settings__group-header">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="7,10 12,15 17,10"/>
-              <line x1="12" y1="15" x2="12" y2="3"/>
-            </svg>
-            <h3 className="settings__group-title">Data &amp; Export</h3>
-          </div>
-          <div className="settings__group-body">
-            <Row label="Export All Data" sub="Download invoices, customers and products as CSV">
-              <button className="settings__export-btn" onClick={handleExportData} disabled={exporting}>
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                  <polyline points="7,10 12,15 17,10"/>
-                  <line x1="12" y1="15" x2="12" y2="3"/>
-                </svg>
-                {exporting ? 'Exporting…' : 'Export CSV'}
-              </button>
-            </Row>
-            <Row label="Invoices" sub="Manage all your billing records">
-              <button className="settings__link-btn" onClick={() => navigate('/invoices')}>View Invoices →</button>
-            </Row>
-            <Row label="Products Catalogue" sub="Manage your product list">
-              <button className="settings__link-btn" onClick={() => navigate('/products')}>View Products →</button>
-            </Row>
-          </div>
+        {/* ── Data & Export ── */}
+<div className="settings__group">
+  <div className="settings__group-header">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+      <polyline points="7,10 12,15 17,10"/>
+      <line x1="12" y1="15" x2="12" y2="3"/>
+    </svg>
+    <h3 className="settings__group-title">Data &amp; Export</h3>
+  </div>
+  <div className="settings__group-body">
+
+    {/* ── Storage row ── */}
+    <div className="settings__row" style={{ flexDirection: 'column', alignItems: 'stretch', gap: 12 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div className="settings__row-info">
+          <span className="settings__row-label">Database Storage</span>
+          <span className="settings__row-sub">Supabase free plan · 500 MB limit</span>
         </div>
+        <button
+          className="settings__export-btn"
+          onClick={handleCheckStorage}
+          disabled={loadingStorage}
+        >
+          {loadingStorage ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ animation: 'spin 1s linear infinite' }}><circle cx="12" cy="12" r="10" strokeOpacity="0.25" /><path d="M22 12a10 10 0 0 0-10-10" /></svg> : <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><ellipse cx="12" cy="5" rx="9" ry="3" /><path d="M3 5v6c0 1.7 4 3 9 3s9-1.3 9-3V5" /><path d="M3 11v6c0 1.7 4 3 9 3s9-1.3 9-3v-6" /></svg>}
+          {loadingStorage ? 'Checking…' : 'Check Storage'}
+        </button>
+      </div>
+
+      {/* Results — only shown after check */}
+      {storageInfo && (
+        <div className="settings__storage-card">
+
+          {/* Progress bar */}
+          <div className="settings__storage-bar-wrap">
+            <div
+              className="settings__storage-bar-fill"
+              style={{
+                width: `${storageInfo.usedPct}%`,
+                background: parseFloat(storageInfo.usedPct) > 80
+                  ? '#e07070'
+                  : parseFloat(storageInfo.usedPct) > 50
+                  ? '#e0aa50'
+                  : '#70c49a',
+              }}
+            />
+          </div>
+
+          {/* Used / limit label */}
+          <div className="settings__storage-bar-labels">
+            <span>{storageInfo.usedMB} MB used</span>
+            <span>{storageInfo.usedPct}% of {storageInfo.limitMB} MB</span>
+          </div>
+
+          {/* Stats grid */}
+          <div className="settings__storage-stats">
+            <div className="settings__storage-stat">
+              <span className="settings__storage-stat-val">{storageInfo.invoiceCount}</span>
+              <span className="settings__storage-stat-label">Invoices created</span>
+            </div>
+            <div className="settings__storage-stat">
+              <span className="settings__storage-stat-val" style={{ color: '#70c49a' }}>
+                ~{storageInfo.moreInvoices}
+              </span>
+              <span className="settings__storage-stat-label">More invoices possible</span>
+            </div>
+            <div className="settings__storage-stat">
+              <span className="settings__storage-stat-val">{storageInfo.custCount}</span>
+              <span className="settings__storage-stat-label">Customers</span>
+            </div>
+            <div className="settings__storage-stat">
+              <span className="settings__storage-stat-val">{storageInfo.remainingMB} MB</span>
+              <span className="settings__storage-stat-label">Remaining</span>
+            </div>
+          </div>
+
+          <p className="settings__storage-note">
+            * Estimate based on your current data size. Actual Supabase usage may vary slightly.
+          </p>
+        </div>
+      )}
+    </div>
+
+    <Row label="Export All Data" sub="Download invoices, customers and products as CSV">
+      <button className="settings__export-btn" onClick={handleExportData} disabled={exporting}>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7,10 12,15 17,10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        {exporting ? 'Exporting…' : 'Export CSV'}
+      </button>
+    </Row>
+    <Row label="Invoices" sub="Manage all your billing records">
+      <button className="settings__link-btn" onClick={() => navigate('/invoices')}>View Invoices →</button>
+    </Row>
+    <Row label="Products Catalogue" sub="Manage your product list">
+      <button className="settings__link-btn" onClick={() => navigate('/products')}>View Products →</button>
+    </Row>
+  </div>
+</div>
 
         {/* ── Keyboard shortcuts (Enterprise feature) ── */}
         <div className="settings__group">

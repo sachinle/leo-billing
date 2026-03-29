@@ -217,3 +217,83 @@ kbd {
   .settings__row { flex-direction: column; align-items: flex-start; gap: 8px; }
   .settings__row-control { align-self: flex-end; }
 }
+
+/* ── Storage card ── */
+.settings__storage-card {
+  background: var(--bg, #0a0a0f);
+  border: 1px solid var(--border, rgba(201,169,110,0.18));
+  border-radius: 12px;
+  padding: 16px 18px;
+}
+
+.settings__storage-bar-wrap {
+  height: 6px;
+  background: rgba(201,169,110,0.1);
+  border-radius: 99px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.settings__storage-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.6s cubic-bezier(0.16,1,0.3,1);
+}
+.settings__storage-bar-labels {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.75rem;
+  color: var(--text-muted, #4e4b63);
+  margin-bottom: 16px;
+}
+
+.settings__storage-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.settings__storage-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.settings__storage-stat-val {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--text-primary, #f0ece4);
+  line-height: 1;
+}
+.settings__storage-stat-label {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.72rem;
+  color: var(--text-muted, #4e4b63);
+}
+
+.settings__storage-note {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.7rem;
+  color: var(--text-muted, #4e4b63);
+  opacity: 0.6;
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .settings__storage-row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .settings__export-btn {
+    align-self: flex-start;
+    padding: 4px 10px;
+    font-size: 0.72rem;
+  }
+}
+
+
+
+@keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
