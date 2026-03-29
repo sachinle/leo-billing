@@ -1,0 +1,18 @@
+version: 2
+updates:
+
+  # ── npm (React, Vite, Supabase, Capacitor, all JS deps) ──
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Kolkata"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+    ignore:
+      # Major version bumps need manual review — too risky to auto-PR
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
