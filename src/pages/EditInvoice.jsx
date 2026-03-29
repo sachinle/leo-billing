@@ -24,10 +24,11 @@ function Toast({ toasts }) {
 }
 
 export default function EditInvoice() {
+  
   const { id }    = useParams();
   const { user }  = useAuth();
   const navigate  = useNavigate();
-
+  const [amountReceived, setAmountReceived] = useState(0);
   const [loading, setLoading]     = useState(true);
   const [saving, setSaving]       = useState(false);
   const [toasts, setToasts]       = useState([]);
@@ -60,6 +61,8 @@ export default function EditInvoice() {
           isExisting: !!inv.customer_id,
         });
         setPaymentStatus(inv.payment_status || 'paid');
+
+        setAmountReceived(Number(inv.amount_received) || 0);
 
         // Map DB items → InvoiceForm item shape
         const mappedItems = (inv.items || []).map(item => ({
@@ -108,6 +111,7 @@ export default function EditInvoice() {
         final_amount:   finalAmount,
         payment_status: paymentStatus,
         amount_due:     amountDue,
+        amount_received: parseFloat(amountReceived) || 0,
       };
 
       // Clean items — strip React-only fields, ensure quantity is NUMERIC (fixes decimal bug)
@@ -257,6 +261,23 @@ export default function EditInvoice() {
               </div>
             </div>
 
+            {/* After the Status summary row */}
+            <div className="ci__summary-row" style={{ flexDirection:'column', alignItems:'flex-start', gap:6 }}>
+              <span className="ci__summary-label">Amount Received</span>
+              <input
+                type="number"
+                value={amountReceived}
+                onChange={e => setAmountReceived(e.target.value)}
+                placeholder="0"
+                style={{
+                  width:'100%', padding:'8px 10px', borderRadius:8,
+                  background:'var(--bg,#0a0a0f)', border:'1px solid var(--border,rgba(201,169,110,0.18))',
+                  color:'var(--text-primary,#f0ece4)', fontFamily:'DM Sans,sans-serif', fontSize:'0.85rem',
+                  outline:'none', boxSizing:'border-box',
+                }}
+              />
+            </div>
+
             {paymentStatus === 'unpaid' && finalAmount > 0 && (
               <div className="ci__unpaid-indicator">
                 <span className="ci__unpaid-indicator-label">
@@ -303,5 +324,7 @@ export default function EditInvoice() {
 
       <style>{`@keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }`}</style>
     </div>
+
+
   );
 }

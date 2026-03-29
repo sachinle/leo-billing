@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef, Fragment } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { getInvoiceWithItems } from '../services/invoiceService';
+import { getInvoiceWithItems, markInvoicePayment } from '../services/invoiceService';
 import { getProfile } from '../services/profileService';
 import { markInvoicePaid } from '../services/profileService';
 import { generatePDF, generateImage } from '../utils/pdfExport';
 import './Viewinvoice.css';
+
+
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function numberToWords(n) {
@@ -148,7 +150,10 @@ export default function ViewInvoice() {
   const [loading, setLoading]       = useState(true);
   const [showFmt, setShowFmt]       = useState(false);
   const [exporting, setExporting]   = useState(null);
-  const [markingPaid, setMarkingPaid] = useState(false);
+  const [markingPaid, setMarkingPaid]     = useState(false);
+  const [showPayModal, setShowPayModal]   = useState(false);
+  const [partialAmt, setPartialAmt]       = useState('');
+  const [payModalError, setPayModalError] = useState('');
   const [toasts, setToasts]         = useState([]);
   const invoiceRef     = useRef();
   const downloadBtnRef = useRef();
@@ -171,16 +176,47 @@ export default function ViewInvoice() {
     .finally(() => setLoading(false));
   }, [id, user]);
 
-  const handleMarkPaid = async () => {
-    if (!invoice || markingPaid) return;
-    setMarkingPaid(true);
-    try {
-      await markInvoicePaid(invoice.id, user.uid);
-      setInvoice(inv => ({ ...inv, payment_status: 'paid', amount_due: 0 }));
-      addToast('Invoice marked as paid!');
-    } catch { addToast('Failed to update status', 'error'); }
-    finally { setMarkingPaid(false); }
-  };
+// Remove old handleMarkPaid, replace with:
+const handleMarkPaid = () => {
+  setPartialAmt('');
+  setPayModalError('');
+  setShowPayModal(true);
+};
+
+const handlePaymentSubmit = async (payFull) => {
+  const finalAmount   = Number(invoice.final_amount) || 0;
+  const prevReceived  = Number(invoice.amount_received) || 0;
+
+  let received;
+  if (payFull) {
+    received = finalAmount;
+  } else {
+    const entered = parseFloat(partialAmt);
+    if (!partialAmt || isNaN(entered) || entered <= 0) {
+      setPayModalError('Enter a valid amount.');
+      return;
+    }
+    if (entered > finalAmount) {
+      setPayModalError(`Cannot exceed invoice total ₹${fmtAmt(finalAmount)}`);
+      return;
+    }
+    received = prevReceived + entered; // cumulative
+  }
+
+  setMarkingPaid(true);
+  setShowPayModal(false);
+  try {
+    const result = await markInvoicePayment(invoice.id, user.uid, received, finalAmount);
+    setInvoice(inv => ({
+      ...inv,
+      amount_received: received,
+      payment_status:  result.isPaidFull ? 'paid' : 'unpaid',
+      amount_due:      result.amountDue,
+    }));
+    addToast(result.isPaidFull ? 'Invoice marked as paid!' : `₹${fmtAmt(received)} recorded. Balance ₹${fmtAmt(result.amountDue)}`);
+  } catch { addToast('Failed to update payment', 'error'); }
+  finally { setMarkingPaid(false); }
+};
 
   const handleDownloadPDF = async () => {
     setExporting('pdf');
@@ -251,10 +287,21 @@ export default function ViewInvoice() {
 
         // writeResult.uri is a file:// URI the Share plugin can read directly
         await Share.share({
-          title: `Invoice ${invoice.invoice_no}`,
-          text:  `Invoice from ${profile?.shop_name || 'Leo Billing'} — ₹${fmtAmt(invoice.final_amount)}`,
-          url:   writeResult.uri,       // file:// URI → triggers native sheet with file
-          dialogTitle: 'Share Invoice',
+            title: `Invoice #${invoice.invoice_no}`,
+            text: [
+              `📄 Invoice #${invoice.invoice_no}`,
+              `🗓️ Date: ${fmtInvoiceDate(invoice.date)}`,
+              `🏪 From: ${profile?.shop_name || 'Leo Billing'}`,
+              `💰 Total: ₹${fmtAmt(invoice.final_amount)}`,
+              Number(invoice.amount_received) > 0
+                ? `✅ Received: ₹${fmtAmt(invoice.amount_received)}`
+                : null,
+              Number(invoice.amount_due) > 0
+                ? `⚠️ Balance Due: ₹${fmtAmt(invoice.amount_due)}`
+                : `✅ Fully Paid`,
+            ].filter(Boolean).join('\n'),
+            url:        writeResult.uri,
+            dialogTitle: 'Share Invoice',
         });
 
         // Clean up temp file after share (best-effort)
@@ -342,6 +389,85 @@ export default function ViewInvoice() {
     <div className="view-invoice-page">
 
       <Toast toasts={toasts} />
+      {/* ── Payment Modal ── */}
+{showPayModal && (
+  <div style={{
+    position:'fixed', inset:0, zIndex:1000,
+    background:'rgba(0,0,0,0.55)', backdropFilter:'blur(4px)',
+    display:'flex', alignItems:'center', justifyContent:'center', padding:20,
+  }}>
+    <div style={{
+      background:'var(--card,#14141c)', border:'1px solid var(--border,rgba(201,169,110,0.18))',
+      borderRadius:16, padding:'28px 24px', width:'100%', maxWidth:360,
+      fontFamily:'DM Sans, sans-serif',
+    }}>
+      <p style={{ fontSize:'0.7rem', fontWeight:600, letterSpacing:'0.14em', textTransform:'uppercase', color:'var(--gold,#c9a96e)', marginBottom:6 }}>Record Payment</p>
+      <p style={{ fontSize:'1.05rem', fontWeight:500, color:'var(--text-primary,#f0ece4)', marginBottom:4 }}>
+        Invoice #{invoice.invoice_no}
+      </p>
+      <p style={{ fontSize:'0.82rem', color:'var(--text-muted,#4e4b63)', marginBottom:20 }}>
+        Total: ₹{fmtAmt(invoice.final_amount)}
+        {Number(invoice.amount_received) > 0 && (
+          <> &nbsp;·&nbsp; Already received: ₹{fmtAmt(invoice.amount_received)}</>
+        )}
+      </p>
+
+      {/* Full payment button */}
+      <button
+        onClick={() => handlePaymentSubmit(true)}
+        disabled={markingPaid}
+        style={{
+          width:'100%', padding:'11px 0', borderRadius:9, border:'none', cursor:'pointer',
+          background:'var(--gold,#c9a96e)', color:'#0a0808',
+          fontFamily:'DM Sans,sans-serif', fontWeight:600, fontSize:'0.9rem', marginBottom:12,
+        }}
+      >
+        ✓ Paid Full Amount (₹{fmtAmt(Number(invoice.final_amount) - Number(invoice.amount_received || 0))})
+      </button>
+
+      {/* Partial payment */}
+      <p style={{ fontSize:'0.75rem', color:'var(--text-muted,#4e4b63)', textAlign:'center', marginBottom:10 }}>— or record partial payment —</p>
+      <input
+        type="number"
+        placeholder="Enter amount received now"
+        value={partialAmt}
+        onChange={e => { setPartialAmt(e.target.value); setPayModalError(''); }}
+        style={{
+          width:'100%', padding:'10px 14px', borderRadius:9, boxSizing:'border-box',
+          background:'var(--bg,#0a0a0f)', border:`1px solid ${payModalError ? '#e07070' : 'var(--border,rgba(201,169,110,0.18))'}`,
+          color:'var(--text-primary,#f0ece4)', fontFamily:'DM Sans,sans-serif', fontSize:'0.9rem',
+          outline:'none', marginBottom:payModalError ? 6 : 12,
+        }}
+      />
+      {payModalError && (
+        <p style={{ fontSize:'0.75rem', color:'#e07070', marginBottom:10 }}>{payModalError}</p>
+      )}
+      <button
+        onClick={() => handlePaymentSubmit(false)}
+        disabled={markingPaid}
+        style={{
+          width:'100%', padding:'10px 0', borderRadius:9, cursor:'pointer',
+          background:'rgba(201,169,110,0.1)', border:'1px solid rgba(201,169,110,0.3)',
+          color:'var(--gold,#c9a96e)', fontFamily:'DM Sans,sans-serif', fontWeight:500, fontSize:'0.875rem', marginBottom:10,
+        }}
+      >
+        Save Partial Payment
+      </button>
+      <button
+        onClick={() => setShowPayModal(false)}
+        style={{
+          width:'100%', padding:'8px 0', borderRadius:9, cursor:'pointer',
+          background:'transparent', border:'1px solid var(--border,rgba(201,169,110,0.18))',
+          color:'var(--text-muted,#4e4b63)', fontFamily:'DM Sans,sans-serif', fontSize:'0.82rem',
+        }}
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+)}
+
+      
 
 
       {/* ── Top bar ── */}
@@ -535,7 +661,7 @@ export default function ViewInvoice() {
             )}
             <div className="vi__totals-row">
               <span>Received</span>
-              <span>₹{isPaid ? fmtAmt(invoice.final_amount) : '0.00'}</span>
+              <span>₹{fmtAmt(Number(invoice.amount_received) || 0)}</span>
             </div>
             {amountDue > 0 && (
               <div className="vi__totals-row" style={{color:'#e07070'}}>
@@ -720,7 +846,7 @@ export default function ViewInvoice() {
               </div>
               <div className="ir__amount-row">
                 <span>Received</span>
-                <span className="ir__amount-val">₹ {isPaid ? fmtAmt(invoice.final_amount) : '0.00'}</span>
+                <span className="ir__amount-val">₹ {fmtAmt(Number(invoice.amount_received) || 0)}</span>
               </div>
               <div className="ir__amount-row" style={{ fontWeight:'bold', borderTop:'2px solid #be1b1b', marginTop:4, paddingTop:8 }}>
                 <span>Balance</span>

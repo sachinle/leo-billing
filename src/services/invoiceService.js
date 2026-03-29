@@ -191,3 +191,25 @@ export async function getInvoiceStats(userId) {
 
   return { totalRevenue: totalRev, totalDue, paidCount, unpaidCount, totalInvoices: invoices.length, last7DaysRevenue: last7 };
 }
+
+// Mark invoice payment — full or partial
+// amount_received: what the customer has paid so far (cumulative)
+// If amount_received >= final_amount → mark paid, amount_due = 0
+// If amount_received < final_amount  → keep unpaid, update amount_due
+export async function markInvoicePayment(invoiceId, userId, amountReceived, finalAmount) {
+  const received   = parseFloat(amountReceived) || 0;
+  const isPaidFull = received >= finalAmount;
+
+  const { error } = await supabase
+    .from('invoices')
+    .update({
+      amount_received: received,
+      payment_status:  isPaidFull ? 'paid' : 'unpaid',
+      amount_due:      isPaidFull ? 0 : Math.max(0, finalAmount - received),
+    })
+    .eq('id', invoiceId)
+    .eq('user_id', userId);
+
+  if (error) throw error;
+  return { isPaidFull, amountDue: isPaidFull ? 0 : Math.max(0, finalAmount - received) };
+}
