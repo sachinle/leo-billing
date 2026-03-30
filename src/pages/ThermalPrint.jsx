@@ -213,31 +213,43 @@ const QRCode = (() => {
 })();
 
 // ── QR Canvas component ───────────────────────────────────────────────────────
-function QRCanvas({ value, size = 140 }) {
+function QRCanvas({ value }) {
   const canvasRef = useRef();
   const [error, setError] = useState(false);
+  const [canvasSize, setCanvasSize] = useState(0);
 
   useEffect(() => {
     if (!value || !canvasRef.current) return;
+    setError(false);
     try {
-      const pixelSize = Math.max(2, Math.floor(size / 45));
-      const ok = QRCode.toCanvas(canvasRef.current, value, pixelSize);
-      setError(!ok);
+      const ok = QRCode.toCanvas(canvasRef.current, value, 3);
+      if (ok) {
+        // Read the actual canvas size AFTER drawing
+        setCanvasSize(canvasRef.current.width);
+      } else {
+        setError(true);
+      }
     } catch {
       setError(true);
     }
-  }, [value, size]);
+  }, [value]);
 
   if (error || !value) {
-    return (
-      <div className="rp__qr-placeholder">QR</div>
-    );
+    return <div className="rp__qr-placeholder">QR</div>;
   }
+
   return (
     <canvas
       ref={canvasRef}
-      className="rp__qr-img"
-      style={{ width: size, height: size, imageRendering: 'pixelated' }}
+      style={{
+        display: 'block',
+        // Use the actual drawn canvas width — never let CSS override it
+        width:  canvasSize || 'auto',
+        height: canvasSize || 'auto',
+        imageRendering: 'pixelated',
+        border: '6px solid #ffffff',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+      }}
     />
   );
 }
@@ -274,7 +286,7 @@ function ReceiptPreview({ shop, invoice, items, settings }) {
       {shop?.fssai   && <div className="rp__center rp__small">FSSAI: {shop.fssai}</div>}
 
       <div className="rp__divider">{divider()}</div>
-      <div className="rp__center rp__bold">TAX INVOICE</div>
+      <div className="rp__center rp__bold">RECEIPT</div>
       <div className="rp__divider">{divider()}</div>
 
       {/* META */}
@@ -322,15 +334,35 @@ function ReceiptPreview({ shop, invoice, items, settings }) {
       {Number(invoice?.discount_total) > 0 && (
         <div className="rp__row"><span>Discount</span><span>-{fa(invoice.discount_total)}</span></div>
       )}
+      
       <div className="rp__divider">{divider('═')}</div>
-      <div className="rp__center rp__bold rp__total">TOTAL: {fa(invoice?.final_amount)}</div>
-      <div className="rp__divider">{divider('═')}</div>
+<div className="rp__center rp__bold rp__total">TOTAL: {fa(invoice?.final_amount)}</div>
+<div className="rp__divider">{divider('═')}</div>
+
+{/* Received & Balance — shown for partial and unpaid invoices */}
+<div className="rp__row">
+  <span>Received</span>
+  <span>{fa(Number(invoice?.amount_received) || 0)}</span>
+</div>
+{Number(invoice?.amount_due) > 0 && (
+  <div className="rp__row rp__bold" style={{ color: '#e07070' }}>
+    <span>Balance Due</span>
+    <span>{fa(invoice?.amount_due)}</span>
+  </div>
+)}
+{Number(invoice?.amount_due) === 0 && (
+  <div className="rp__row" style={{ color: '#70c49a' }}>
+    <span>Balance</span>
+    <span>PAID</span>
+  </div>
+)}
+<div className="rp__divider">{divider('═')}</div>
 
       {/* UPI QR — rendered via pure-JS canvas, no network needed */}
       {upiStr ? (
         <div className="rp__qr-block">
           <div className="rp__center rp__bold">Scan to Pay (UPI)</div>
-          <QRCanvas value={upiStr} size={140} />
+          <QRCanvas value={upiStr} />
           <div className="rp__center rp__small">{shop?.upi}</div>
           <div className="rp__divider">{divider()}</div>
         </div>
@@ -775,7 +807,7 @@ export default function ThermalPrint() {
       {/* ── BOTTOM PRINT BAR ── */}
       <div className="tp__print-bar">
         <div className="tp__print-bar-info">
-          <div className="tp__print-amt">₹{Number(invoice?.final_amount || 0).toFixed(2)}</div>
+          <div className="tp__print-amt">₹{Number(invoice?.amount_due || 0).toFixed(2)}</div>
           <div className="tp__print-meta">
             {settings.paperWidth}mm · {copies} cop{copies !== 1 ? 'ies' : 'y'}
             {settings.autoCut ? ' · Auto-cut' : ''}

@@ -349,16 +349,29 @@ export function buildReceipt({ shop, invoice, items, settings }) {
   });
 
   push(...div(W));
-  const LW = W - 12;
-  push(...ln(pr(`Items: ${(items||[]).length}`, LW) + pl(fa(invoice.subtotal), 12)));
-  if (Number(invoice.discount_total) > 0) {
-    push(...ln(pr("Discount", LW) + pl(`-${fa(invoice.discount_total)}`, 12)));
-  }
-  push(...div(W, "="));
-  push(CMD.BOLD_ON, CMD.DOUBLE_HEIGHT, CMD.ALIGN_CENTER);
-  push(...ln(`TOTAL: ${fa(invoice.final_amount)}`));
-  push(CMD.NORMAL_SIZE, CMD.BOLD_OFF, CMD.ALIGN_LEFT);
-  push(...div(W));
+const LW = W - 12;
+push(...ln(pr(`Items: ${(items||[]).length}`, LW) + pl(fa(invoice.subtotal), 12)));
+if (Number(invoice.discount_total) > 0) {
+  push(...ln(pr("Discount", LW) + pl(`-${fa(invoice.discount_total)}`, 12)));
+}
+push(...div(W, "="));
+push(CMD.BOLD_ON, CMD.DOUBLE_HEIGHT, CMD.ALIGN_CENTER);
+push(...ln(`TOTAL: ${fa(invoice.final_amount)}`));
+push(CMD.NORMAL_SIZE, CMD.BOLD_OFF, CMD.ALIGN_LEFT);
+push(...div(W, "="));
+
+// Received & Balance
+const received = Number(invoice.amount_received) || 0;
+const due      = Number(invoice.amount_due)      || 0;
+push(...ln(pr("Received", LW) + pl(fa(received), 12)));
+if (due > 0) {
+  push(CMD.BOLD_ON);
+  push(...ln(pr("Balance Due", LW) + pl(fa(due), 12)));
+  push(CMD.BOLD_OFF);
+} else {
+  push(...ln(pr("Balance", LW) + pl("PAID", 12)));
+}
+push(...div(W));
 
   const isUnpaid = invoice.payment_status === "unpaid";
   const upiAmt = isUnpaid ? invoice.amount_due : invoice.final_amount;
