@@ -18,6 +18,7 @@ import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import PrinterSettings from './pages/PrinterSettings';
 import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from "@vercel/speed-insights/react"
 
 function AppRoutes() {
   const { user, loading } = useAuth();
@@ -87,6 +88,7 @@ function App() {
         <PullToRefresh>
           <AppRoutes />
           <Analytics />
+          <SpeedInsights/>
         </PullToRefresh>
       </ThemeProvider>
     </BrowserRouter>
