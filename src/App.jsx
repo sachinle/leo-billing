@@ -17,6 +17,7 @@ import ViewInvoice from './pages/ViewInvoice';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import PrinterSettings from './pages/PrinterSettings';
+import { Analytics } from "@vercel/analytics/react"
 
 function AppRoutes() {
   const { user, loading } = useAuth();
@@ -85,6 +86,7 @@ function App() {
       <ThemeProvider>
         <PullToRefresh>
           <AppRoutes />
+          <Analytics />
         </PullToRefresh>
       </ThemeProvider>
     </BrowserRouter>

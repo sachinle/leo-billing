@@ -21,6 +21,7 @@
     "@capacitor/status-bar": "^8.0.1",
     "@capacitor/toast": "^8.0.1",
     "@supabase/supabase-js": "^2.97.0",
+    "@vercel/analytics": "^2.0.1",
     "firebase": "^12.9.0",
     "html2canvas": "^1.4.1",
     "jspdf": "^4.2.1",
