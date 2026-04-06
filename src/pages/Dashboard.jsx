@@ -167,7 +167,7 @@ export default function Dashboard() {
           value={fmt(stats.totalRevenue)}
           sub={`${stats.invoiceCount} invoice${stats.invoiceCount !== 1 ? 's' : ''} total`}
           delay={0}
-          icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="5" x2="18" y2="5"/><line x1="6" y1="9" x2="18" y2="9"/><path d="M6 5c4 0 7 0 7 4s-3 4-7 4l7 7"/></svg>}/>
+          icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><line x1="6" y1="5" x2="18" y2="5"/><line x1="6" y1="9" x2="18" y2="9"/><path d="M6 5c4 0 7 0 7 4s-3 4-7 4l7 7"/></svg>}/>
         <StatCard
           label="Today's Revenue"
           value={fmt(stats.todayRevenue)}
