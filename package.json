@@ -20,7 +20,7 @@
     "@capacitor/share": "^8.0.1",
     "@capacitor/status-bar": "^8.0.1",
     "@capacitor/toast": "^8.0.1",
-    "@supabase/supabase-js": "^2.97.0",
+    "@supabase/supabase-js": "^2.101.1",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "dompurify": "^3.3.2",
