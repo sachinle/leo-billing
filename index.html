@@ -6,9 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>Leo Billing .</title>
 
-    <!-- ── Google Fonts — preconnect first for speed, then single load ── -->
+    <!-- ── DNS / connection warmup — starts before any JS runs ── -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://jtzrkexvyuvfgmngdhzb.supabase.co" />
+    <link rel="dns-prefetch" href="https://jtzrkexvyuvfgmngdhzb.supabase.co" />
+    <link rel="preconnect" href="https://identitytoolkit.googleapis.com" />
+
+    <!-- ── Preload critical font (Playfair Display 500 — used for h1 LCP element) ── -->
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="https://fonts.gstatic.com/s/playfairdisplay/v37/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKdFvUDQ.woff2"
+      crossorigin
+    />
+
+    <!-- ── All fonts in one request with display=swap ── -->
     <link
       href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Pacifico&display=swap"
       rel="stylesheet"
