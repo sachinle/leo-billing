@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { addLoyaltyPoints, redeemLoyaltyPoints } from './customerService';
 
 // Get all invoices for the current user, newest first
 export async function getInvoices(userId) {
@@ -70,8 +71,18 @@ export async function createInvoice(userId, invoiceData, items) {
         amount: invoiceData.final_amount
       });
     } catch (e) {
-      // RPC might not exist — non-fatal, just log
       console.warn('[invoiceService] update_customer_total_purchase RPC not found:', e.message);
+    }
+
+    // Award loyalty points: 100 pts for purchases >= ₹500
+    const pointsEarned = invoiceData.loyalty_points_earned || 0;
+    if (pointsEarned > 0) {
+      await addLoyaltyPoints(invoiceData.customer_id, pointsEarned);
+    }
+
+    // If loyalty discount was applied, redeem 1000 points from customer
+    if (Number(invoiceData.loyalty_discount_applied) > 0) {
+      await redeemLoyaltyPoints(invoiceData.customer_id);
     }
   }
 

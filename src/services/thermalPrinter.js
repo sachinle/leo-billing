@@ -354,6 +354,9 @@ push(...ln(pr(`Items: ${(items||[]).length}`, LW) + pl(fa(invoice.subtotal), 12)
 if (Number(invoice.discount_total) > 0) {
   push(...ln(pr("Discount", LW) + pl(`-${fa(invoice.discount_total)}`, 12)));
 }
+if (Number(invoice.loyalty_discount_applied) > 0) {
+  push(...ln(pr("* Loyalty Reward", LW) + pl(`-${fa(invoice.loyalty_discount_applied)}`, 12)));
+}
 push(...div(W, "="));
 push(CMD.BOLD_ON, CMD.DOUBLE_HEIGHT, CMD.ALIGN_CENTER);
 push(...ln(`TOTAL: ${fa(invoice.final_amount)}`));
@@ -415,6 +418,18 @@ push(...div(W));
     push(...ln(""));
     push(...ln(shop.signatory));
     push(CMD.FONT_SMALL); push(...ln("Authorised Signatory")); push(CMD.FONT_NORMAL, CMD.ALIGN_LEFT);
+    push(...div(W));
+  }
+
+  // Loyalty points summary at footer
+  const lpEarned  = Number(invoice.loyalty_points_earned)    || 0;
+  const lpRedeemed = Number(invoice.loyalty_discount_applied) || 0;
+  if (lpEarned > 0 || lpRedeemed > 0) {
+    push(CMD.ALIGN_CENTER, CMD.FONT_SMALL);
+    push(...ln("--- LOYALTY POINTS ---"));
+    if (lpRedeemed > 0) push(...ln(`Reward Used: -Rs.${fa(lpRedeemed)} (1000 pts)`));
+    if (lpEarned  > 0) push(...ln(`Points Earned: +${lpEarned} pts`));
+    push(CMD.FONT_NORMAL, CMD.ALIGN_LEFT);
     push(...div(W));
   }
 

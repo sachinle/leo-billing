@@ -12,6 +12,7 @@ import ThermalPrint from '../pages/ThermalPrint';
 import PrinterSettings from '../pages/PrinterSettings';
 import Settings from '../pages/Settings';
 import Profile from '../pages/Profile';
+import Analytics from '../pages/Analytics';
 import './Layout.css';
 
 export default function Layout() {
@@ -86,6 +87,7 @@ export default function Layout() {
           <Route path="/invoices/edit/:id" element={<EditInvoice />} />
           <Route path="/invoices/view/:id" element={<ViewInvoice />} />
           <Route path="/invoices/view/:id/print" element={<ThermalPrint />} />
+          <Route path="/analytics" element={<Analytics />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/printer" element={<PrinterSettings />} />
           <Route path="/profile" element={<Profile />} />

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../hooks/useAuth';
 import { logout } from '../services/firebase';
@@ -6,7 +6,15 @@ import { useNavigate } from 'react-router-dom';
 import { getInvoices } from '../services/invoiceService';
 import { getCustomers } from '../services/customerService';
 import { getProducts } from '../services/productService';
+import { getProfile, saveProfile } from '../services/profileService';
 import './Settings.css';
+
+// ── Feature flags stored in localStorage ─────────────────────────────────────
+export const getStockEnabled = () => {
+  const v = localStorage.getItem('leo_stock_enabled');
+  return v === null ? true : v === 'true';
+};
+
 
 function Toast({ toasts }) {
   return (
@@ -34,6 +42,48 @@ export default function Settings() {
   const [exporting, setExporting] = useState(false);
 
   const isDark = theme === 'dark';
+
+  // ── Feature flags ─────────────────────────────────────────────────────────
+  const [stockEnabled, setStockEnabled] = useState(getStockEnabled);
+
+  // ── Quick profile edit ────────────────────────────────────────────────────
+  const [profileEdit, setProfileEdit] = useState({ shopName: '', upiId: '', phone: '', terms: '' });
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [profileSaving,  setProfileSaving]  = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    getProfile(user.uid).then(p => {
+      if (p) setProfileEdit({
+        shopName: p.shop_name || '',
+        upiId:    p.upi_id   || '',
+        phone:    p.phone    || '',
+        terms:    p.terms    || '',
+      });
+    }).catch(() => {});
+  }, [user]);
+
+  const handleQuickProfileSave = async () => {
+    if (!user || profileSaving) return;
+    setProfileSaving(true);
+    try {
+      await saveProfile(user.uid, {
+        shop_name: profileEdit.shopName,
+        upi_id:    profileEdit.upiId,
+        phone:     profileEdit.phone,
+        terms:     profileEdit.terms,
+      });
+      addToast('Profile updated!');
+    } catch (err) {
+      addToast('Failed to save: ' + (err.message || 'Unknown'), 'error');
+    } finally {
+      setProfileSaving(false);
+    }
+  };
+
+  useEffect(() => {
+    localStorage.setItem('leo_stock_enabled', String(stockEnabled));
+  }, [stockEnabled]);
 
   const addToast = (message, type = 'success') => {
     const id = Date.now() + Math.random();
@@ -189,7 +239,76 @@ const handleCheckStorage = async () => {
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <polyline points="20,6 9,17 4,12"/>
             </svg>
-            Leo Billing v2.0.0
+            Leo Billing v2.1.0
+          </div>
+        </div>
+
+        {/* ── Quick Profile Edit ── */}
+        <div className="settings__group">
+          <div className="settings__group-header">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+            </svg>
+            <h3 className="settings__group-title">Quick Profile Edit</h3>
+          </div>
+          <div className="settings__group-body">
+            <Row label="Shop Name" sub="Shown on every invoice">
+              <input
+                value={profileEdit.shopName}
+                onChange={e => setProfileEdit(p => ({ ...p, shopName: e.target.value }))}
+                placeholder="Your shop name"
+                style={{
+                  padding: '7px 12px', borderRadius: 8, border: '1px solid var(--border,rgba(201,169,110,0.18))',
+                  background: 'var(--bg,#0a0a0f)', color: 'var(--text-primary,#f0ece4)',
+                  fontFamily: 'DM Sans, sans-serif', fontSize: '0.85rem', width: 200,
+                }}
+              />
+            </Row>
+            <Row label="UPI ID" sub="Used in thermal receipt QR code">
+              <input
+                value={profileEdit.upiId}
+                onChange={e => setProfileEdit(p => ({ ...p, upiId: e.target.value }))}
+                placeholder="name@bank"
+                style={{
+                  padding: '7px 12px', borderRadius: 8, border: '1px solid var(--border,rgba(201,169,110,0.18))',
+                  background: 'var(--bg,#0a0a0f)', color: 'var(--text-primary,#f0ece4)',
+                  fontFamily: 'DM Sans, sans-serif', fontSize: '0.85rem', width: 200,
+                }}
+              />
+            </Row>
+            <Row label="Phone" sub="Contact shown on invoice">
+              <input
+                value={profileEdit.phone}
+                onChange={e => setProfileEdit(p => ({ ...p, phone: e.target.value }))}
+                placeholder="Phone number"
+                style={{
+                  padding: '7px 12px', borderRadius: 8, border: '1px solid var(--border,rgba(201,169,110,0.18))',
+                  background: 'var(--bg,#0a0a0f)', color: 'var(--text-primary,#f0ece4)',
+                  fontFamily: 'DM Sans, sans-serif', fontSize: '0.85rem', width: 200,
+                }}
+              />
+            </Row>
+            <Row label="Invoice Terms" sub="Shown at bottom of every invoice">
+              <textarea
+                value={profileEdit.terms}
+                onChange={e => setProfileEdit(p => ({ ...p, terms: e.target.value }))}
+                placeholder="Thank you for your business!"
+                rows={2}
+                style={{
+                  padding: '7px 12px', borderRadius: 8, border: '1px solid var(--border,rgba(201,169,110,0.18))',
+                  background: 'var(--bg,#0a0a0f)', color: 'var(--text-primary,#f0ece4)',
+                  fontFamily: 'DM Sans, sans-serif', fontSize: '0.85rem', width: 200, resize: 'vertical',
+                }}
+              />
+            </Row>
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', paddingTop: 4 }}>
+              <button className="settings__link-btn" onClick={() => navigate('/profile')}>
+                Full Profile →
+              </button>
+              <button className="settings__export-btn" onClick={handleQuickProfileSave} disabled={profileSaving}>
+                {profileSaving ? 'Saving…' : 'Save Changes'}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -239,6 +358,39 @@ const handleCheckStorage = async () => {
             <Row label="Business Profile" sub="Shop name, address, GST, bank details">
               <button className="settings__link-btn" onClick={() => navigate('/profile')}>Edit Profile →</button>
             </Row>
+          </div>
+        </div>
+
+        {/* ── Business Features ── */}
+        <div className="settings__group">
+          <div className="settings__group-header">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+            </svg>
+            <h3 className="settings__group-title">Business Features</h3>
+          </div>
+          <div className="settings__group-body">
+
+            {/* Stock Management toggle */}
+            <Row label="Stock Management" sub="Track product inventory levels. Turn off to simplify billing.">
+              <div className="settings__theme-toggle">
+                <span className="settings__theme-opt">{stockEnabled ? '📦 On' : '🚫 Off'}</span>
+                <button
+                  className={`settings__pill${stockEnabled ? ' settings__pill--dark' : ' settings__pill--light'}`}
+                  onClick={() => setStockEnabled(v => !v)}
+                  aria-label="Toggle stock management"
+                  style={stockEnabled ? { background: '#70c49a' } : {}}
+                >
+                  <span className="settings__pill-thumb" />
+                </button>
+              </div>
+            </Row>
+
+            {/* Loyalty Points info */}
+            <Row label="Loyalty Points" sub="Customers earn 100 pts per ₹1000 spent (lifetime). At 1000 pts they get ₹50 off.">
+              <span className="settings__val" style={{ color: '#c9a96e' }}>★ Active</span>
+            </Row>
+
           </div>
         </div>
 
@@ -383,7 +535,7 @@ const handleCheckStorage = async () => {
           </div>
           <div className="settings__group-body">
             <Row label="App Version" sub="Leo Billing">
-              <span className="settings__val">v1.0.0</span>
+              <span className="settings__val">v2.1.0</span>
             </Row>
             <Row label="Database" sub="Supabase (PostgreSQL)">
               <span className="settings__status-dot">

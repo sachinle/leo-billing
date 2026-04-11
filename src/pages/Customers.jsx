@@ -381,6 +381,11 @@ export default function Customers() {
     return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
   }).length;
 
+  // ── LTV & Loyalty stats ──
+  const avgLTV         = customers.length > 0 ? totalRevenue / customers.length : 0;
+  const loyaltyReady   = customers.filter(c => Number(c.loyalty_points) >= 1000).length;
+  const totalLoyaltyPts = customers.reduce((s, c) => s + (Number(c.loyalty_points) || 0), 0);
+
   const hasEmail   = tableColumns.includes('email');
   const hasAddress = tableColumns.includes('address');
 
@@ -432,6 +437,10 @@ export default function Customers() {
           <p className="cstat__value">{fmt(totalRevenue)}</p>
         </div>
         <div className="cstat">
+          <p className="cstat__label">Avg Lifetime Value</p>
+          <p className="cstat__value">{fmt(avgLTV)}</p>
+        </div>
+        <div className="cstat">
           <p className="cstat__label">New This Month</p>
           <p className="cstat__value">{newThisMonth}</p>
         </div>
@@ -439,6 +448,12 @@ export default function Customers() {
           <p className="cstat__label">Top Customer</p>
           <p className="cstat__value cstat__value--name">{topCustomer?.name || '—'}</p>
         </div>
+        {loyaltyReady > 0 && (
+          <div className="cstat" style={{ borderColor: 'rgba(201,169,110,0.3)', background: 'rgba(201,169,110,0.05)' }}>
+            <p className="cstat__label" style={{ color: '#c9a96e' }}>★ Loyalty Ready</p>
+            <p className="cstat__value" style={{ color: '#c9a96e' }}>{loyaltyReady} customer{loyaltyReady !== 1 ? 's' : ''}</p>
+          </div>
+        )}
       </div>
 
       {/* ── Toolbar ── */}
@@ -511,6 +526,7 @@ export default function Customers() {
                 <th className="col-sortable" onClick={() => handleSort('total_purchase')}>
                   Total Purchase <SortIcon col="total_purchase" />
                 </th>
+                <th style={{ color: '#c9a96e' }}>★ Loyalty</th>
                 <th className="col-sortable" onClick={() => handleSort('created_at')}>
                   Joined <SortIcon col="created_at" />
                 </th>
@@ -545,6 +561,26 @@ export default function Customers() {
                     <td className="cell-email">{c.email || <span className="cell-empty">—</span>}</td>
                   )}
                   <td className="cell-amount">{fmt(c.total_purchase)}</td>
+                  <td>
+                    {Number(c.loyalty_points) > 0 ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                        <span style={{
+                          fontSize: '0.78rem', fontWeight: 700, fontFamily: 'DM Sans',
+                          color: Number(c.loyalty_points) >= 1000 ? '#c9a96e' : 'var(--text-secondary,#8a8598)',
+                        }}>
+                          {Number(c.loyalty_points) >= 1000 ? '★ ' : ''}{c.loyalty_points} pts
+                        </span>
+                        <div style={{ width: 60, height: 3, borderRadius: 3, background: 'rgba(255,255,255,0.08)' }}>
+                          <div style={{
+                            height: '100%', borderRadius: 3, background: '#c9a96e',
+                            width: `${Math.min(100, (Number(c.loyalty_points) / 1000) * 100)}%`,
+                          }} />
+                        </div>
+                      </div>
+                    ) : (
+                      <span style={{ color: 'var(--text-muted,#4e4b63)', fontSize: '0.78rem' }}>0 pts</span>
+                    )}
+                  </td>
                   <td className="cell-date">{fmtDate(c.created_at)}</td>
                   <td>
                     <div className="row-actions">

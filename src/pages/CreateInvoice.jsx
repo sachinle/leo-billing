@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate, Link } from 'react-router-dom';
 import { generateInvoiceNo } from '../utils/generateInvoiceNo';
 import { createInvoice } from '../services/invoiceService';
 import { addProduct, searchProducts } from '../services/productService';
-import { addCustomer, searchCustomers } from '../services/customerService';
+import { addCustomer, searchCustomers, getCustomer } from '../services/customerService';
 import InvoiceForm from '../components/InvoiceForm';
 import './CreateInvoice.css';
 
@@ -43,6 +43,26 @@ const today = new Date().toLocaleDateString('en-CA');
   const [saving, setSaving]                   = useState(false);
   const [toasts, setToasts]                   = useState([]);
 
+  // ── Loyalty Points ─────────────────────────────────────────────────────
+  const [loyaltyInfo, setLoyaltyInfo]           = useState(null); // { points, canRedeem }
+  const [applyLoyaltyDiscount, setApplyLoyalty] = useState(false);
+  const LOYALTY_THRESHOLD = 1000;
+  const LOYALTY_DISCOUNT  = 50;
+  // 100 pts per ₹1000 spent (calculated from total lifetime purchase, not per-bill flat)
+  const LOYALTY_EARN_PTS_PER_K = 100;
+
+  // Fetch loyalty info when an existing customer is selected
+  useEffect(() => {
+    if (!customer.id) { setLoyaltyInfo(null); setApplyLoyalty(false); return; }
+    let cancelled = false;
+    getCustomer(customer.id).then(c => {
+      if (cancelled) return;
+      const pts = Number(c?.loyalty_points) || 0;
+      setLoyaltyInfo({ points: pts, canRedeem: pts >= LOYALTY_THRESHOLD });
+    }).catch(() => setLoyaltyInfo(null));
+    return () => { cancelled = true; };
+  }, [customer.id]);
+
   const addToast = (message, type = 'success') => {
     const id = Date.now() + Math.random();
     setToasts(t => [...t, { id, message, type }]);
@@ -50,11 +70,14 @@ const today = new Date().toLocaleDateString('en-CA');
   };
 
   // ── Computed totals ─────────────────────────────────────────────────────
-  const subtotal      = items.reduce((s, i) => s + ((parseFloat(i.quantity) || 0) * (parseFloat(i.price) || 0)), 0);
-  const discountTotal = items.reduce((s, i) => s + (parseFloat(i.discount) || 0), 0);
-  const finalAmount   = Math.max(0, subtotal - discountTotal);
+  const subtotal        = items.reduce((s, i) => s + ((parseFloat(i.quantity) || 0) * (parseFloat(i.price) || 0)), 0);
+  const discountTotal   = items.reduce((s, i) => s + (parseFloat(i.discount) || 0), 0);
+  const loyaltyDiscount = (applyLoyaltyDiscount && loyaltyInfo?.canRedeem) ? LOYALTY_DISCOUNT : 0;
+  const finalAmount     = Math.max(0, subtotal - discountTotal - loyaltyDiscount);
+  // Points earned: 100 pts per ₹1000 in this invoice (rounded down)
+  const pointsToEarn    = Math.floor(finalAmount / 1000) * LOYALTY_EARN_PTS_PER_K;
   // amount_due: 0 if paid, full amount if unpaid
-  const amountDue     = paymentStatus === 'paid' ? 0 : finalAmount;
+  const amountDue       = paymentStatus === 'paid' ? 0 : finalAmount;
 
   // ── Save ────────────────────────────────────────────────────────────────
   const handleSave = async () => {
@@ -118,19 +141,21 @@ const today = new Date().toLocaleDateString('en-CA');
         });
       }
 
-      // 3. Create invoice — includes payment_status & amount_due
+      // 3. Create invoice — includes payment_status, amount_due & loyalty fields
       const invoiceData = {
-        invoice_no:      invoiceNo,
-        date:            today,
-        time:            invoiceTime,
-        customer_id:     customerId,
-        customer_name:   customer.name.trim(),
-        customer_phone:  customer.phone.trim(),
+        invoice_no:               invoiceNo,
+        date:                     today,
+        time:                     invoiceTime,
+        customer_id:              customerId,
+        customer_name:            customer.name.trim(),
+        customer_phone:           customer.phone.trim(),
         subtotal,
-        discount_total:  discountTotal,
-        final_amount:    finalAmount,
-        payment_status:  paymentStatus,   // 'paid' | 'unpaid'
-        amount_due:      amountDue,       // 0 or finalAmount
+        discount_total:           discountTotal,
+        final_amount:             finalAmount,
+        payment_status:           paymentStatus,
+        amount_due:               amountDue,
+        loyalty_points_earned:    pointsToEarn,
+        loyalty_discount_applied: loyaltyDiscount,
       };
 
       const saved = await createInvoice(user.uid, invoiceData, dbItems);
@@ -183,6 +208,13 @@ const today = new Date().toLocaleDateString('en-CA');
           <div>
             <div className="ci__mobile-total-label">Final Amount</div>
             <div className="ci__mobile-total-val">{fmtRs(finalAmount)}</div>
+            {loyaltyInfo && (
+              <div style={{ fontSize: '0.68rem', color: '#c9a96e', fontFamily: 'DM Sans', marginTop: 2 }}>
+                ★ {loyaltyInfo.points} pts
+                {loyaltyInfo.canRedeem && !applyLoyaltyDiscount && ' · ₹50 reward available'}
+                {loyaltyDiscount > 0 && ' · ₹50 discount applied'}
+              </div>
+            )}
           </div>
           <span className="ci__mobile-status-pill" style={{
             color: paymentStatus === 'paid' ? '#70c49a' : '#e0aa50',
@@ -192,6 +224,23 @@ const today = new Date().toLocaleDateString('en-CA');
             {paymentStatus === 'paid' ? '✓ Paid' : '⏳ Unpaid'}
           </span>
         </div>
+        {/* Mobile loyalty toggle if eligible */}
+        {loyaltyInfo?.canRedeem && (
+          <label style={{
+            display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0',
+            borderBottom: '1px solid rgba(201,169,110,0.15)', marginBottom: 4, cursor: 'pointer',
+          }}>
+            <input
+              type="checkbox"
+              checked={applyLoyaltyDiscount}
+              onChange={e => setApplyLoyalty(e.target.checked)}
+              style={{ accentColor: '#c9a96e', width: 15, height: 15 }}
+            />
+            <span style={{ fontSize: '0.78rem', fontFamily: 'DM Sans', color: '#c9a96e' }}>
+              ★ Apply ₹50 loyalty reward (1000 pts)
+            </span>
+          </label>
+        )}
         <button className="ci__mobile-save-btn" onClick={handleSave} disabled={saving}>
           {saving ? 'Saving…' : (
             <>
@@ -234,11 +283,23 @@ const today = new Date().toLocaleDateString('en-CA');
                 <span className="ci__summary-val">{fmtRs(subtotal)}</span>
               </div>
               <div className="ci__summary-row">
-                <span className="ci__summary-label">Total Discount</span>
+                <span className="ci__summary-label">Item Discounts</span>
                 <span className="ci__summary-discount">
                   {discountTotal > 0 ? `-${fmtRs(discountTotal)}` : '—'}
                 </span>
               </div>
+
+              {/* Loyalty discount row */}
+              {loyaltyDiscount > 0 && (
+                <div className="ci__summary-row">
+                  <span className="ci__summary-label" style={{ color: '#c9a96e' }}>
+                    ★ Loyalty Discount
+                  </span>
+                  <span className="ci__summary-discount" style={{ color: '#c9a96e' }}>
+                    −{fmtRs(loyaltyDiscount)}
+                  </span>
+                </div>
+              )}
               <div className="ci__summary-row">
                 <span className="ci__summary-label">Status</span>
                 <span style={{
@@ -271,10 +332,76 @@ const today = new Date().toLocaleDateString('en-CA');
               </div>
             )}
 
+            {/* Points to earn indicator */}
+            {finalAmount >= 1000 ? (
+              <div style={{
+                padding: '6px 10px', borderRadius: 7, marginBottom: 4,
+                background: 'rgba(201,169,110,0.08)', border: '1px solid rgba(201,169,110,0.2)',
+                fontSize: '0.75rem', color: '#c9a96e', fontFamily: 'DM Sans',
+              }}>
+                +{pointsToEarn} loyalty pts will be earned (100 per ₹1000)
+              </div>
+            ) : finalAmount > 0 ? (
+              <div style={{
+                padding: '6px 10px', borderRadius: 7, marginBottom: 4,
+                background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)',
+                fontSize: '0.72rem', color: 'var(--text-muted,#6b6887)', fontFamily: 'DM Sans',
+              }}>
+                Min ₹1000 to earn loyalty pts
+              </div>
+            ) : null}
+
             <div className="ci__summary-total">
               <span className="ci__summary-total-label">Final Amount</span>
               <span className="ci__summary-total-val">{fmtRs(finalAmount)}</span>
             </div>
+
+            {/* Loyalty section */}
+            {loyaltyInfo && (
+              <div style={{
+                padding: '10px 12px', borderRadius: 9, marginBottom: 10,
+                background: loyaltyInfo.canRedeem
+                  ? 'rgba(201,169,110,0.12)' : 'rgba(201,169,110,0.05)',
+                border: `1px solid ${loyaltyInfo.canRedeem ? 'rgba(201,169,110,0.4)' : 'rgba(201,169,110,0.15)'}`,
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: loyaltyInfo.canRedeem ? 8 : 0 }}>
+                  <span style={{ fontSize: '0.78rem', fontFamily: 'DM Sans', color: '#c9a96e', fontWeight: 600 }}>
+                    ★ Loyalty Points
+                  </span>
+                  <span style={{ fontSize: '0.82rem', fontFamily: 'DM Sans', color: 'var(--text-primary,#f0ece4)', fontWeight: 700 }}>
+                    {loyaltyInfo.points} pts
+                  </span>
+                </div>
+                {/* Progress to next reward */}
+                {!loyaltyInfo.canRedeem && (
+                  <div style={{ marginTop: 4 }}>
+                    <div style={{ height: 4, borderRadius: 4, background: 'rgba(201,169,110,0.15)', overflow: 'hidden' }}>
+                      <div style={{
+                        height: '100%', borderRadius: 4, background: '#c9a96e',
+                        width: `${Math.min(100, (loyaltyInfo.points / LOYALTY_THRESHOLD) * 100)}%`,
+                        transition: 'width 0.5s ease',
+                      }} />
+                    </div>
+                    <div style={{ fontSize: '0.7rem', color: 'var(--text-muted,#6b6887)', fontFamily: 'DM Sans', marginTop: 3 }}>
+                      {LOYALTY_THRESHOLD - loyaltyInfo.points} pts to ₹50 reward
+                    </div>
+                  </div>
+                )}
+                {loyaltyInfo.canRedeem && (
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={applyLoyaltyDiscount}
+                      onChange={e => setApplyLoyalty(e.target.checked)}
+                      style={{ accentColor: '#c9a96e', width: 15, height: 15 }}
+                    />
+                    <span style={{ fontSize: '0.8rem', fontFamily: 'DM Sans', color: 'var(--text-primary,#f0ece4)' }}>
+                      Apply ₹50 reward (uses 1000 pts)
+                    </span>
+                  </label>
+                )}
+              </div>
+            )}
 
             <button className="ci__save-btn" onClick={handleSave} disabled={saving}>
               {saving ? (

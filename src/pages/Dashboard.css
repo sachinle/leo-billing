@@ -147,3 +147,54 @@
   .dashboard__header-right { align-items:flex-start; }
   .invoice-table th, .invoice-table td { padding:12px 16px; }
 }
+/* ── Revenue chart section ── */
+.dashboard__chart-section {
+  background: var(--card, #14141c);
+  border: 1px solid var(--border, rgba(201,169,110,0.18));
+  border-radius: 16px;
+  padding: 20px 24px 16px;
+  margin-bottom: 24px;
+}
+.dashboard__chart-header {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;
+}
+.dashboard__chart-title {
+  font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 600;
+  color: var(--text-primary, #f0ece4); margin: 0;
+}
+.dashboard__chart-wrap { display: flex; flex-direction: column; gap: 4px; }
+.dashboard__chart-svg-wrap { width: 100%; }
+.dashboard__chart-xlabels {
+  display: flex; justify-content: space-between; padding: 0 4px;
+}
+
+/* ── Quick actions ── */
+.dashboard__quick-actions {
+  display: flex; gap: 10px; margin-bottom: 28px; flex-wrap: wrap;
+}
+.dashboard__quick-btn {
+  display: flex; align-items: center; gap: 7px;
+  padding: 9px 16px; border-radius: 10px;
+  background: var(--card, #14141c);
+  border: 1px solid var(--border, rgba(201,169,110,0.18));
+  color: var(--text-secondary, #8a8598);
+  font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 500;
+  text-decoration: none; transition: all 0.2s ease; cursor: pointer;
+}
+.dashboard__quick-btn:hover {
+  border-color: rgba(201,169,110,0.35); color: var(--gold, #c9a96e);
+  background: rgba(201,169,110,0.05);
+}
+.dashboard__quick-btn--primary {
+  background: rgba(201,169,110,0.1); border-color: rgba(201,169,110,0.3);
+  color: var(--gold, #c9a96e); font-weight: 600;
+}
+.dashboard__quick-btn--primary:hover {
+  background: rgba(201,169,110,0.18); border-color: rgba(201,169,110,0.5);
+}
+
+@media (max-width: 768px) {
+  .dashboard__quick-actions { gap: 8px; }
+  .dashboard__quick-btn { padding: 8px 13px; font-size: 0.78rem; }
+  .dashboard__chart-section { padding: 16px; }
+}

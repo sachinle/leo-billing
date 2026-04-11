@@ -53,3 +53,39 @@ export async function searchCustomers(userId, query) {
   if (error) throw error;
   return data;
 }
+
+// Get a single customer by ID (includes loyalty_points)
+export async function getCustomer(id) {
+  const { data, error } = await supabase
+    .from('customers')
+    .select('*')
+    .eq('id', id)
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+// Award loyalty points via RPC (100 pts per qualifying purchase)
+export async function addLoyaltyPoints(customerId, points) {
+  try {
+    const { error } = await supabase.rpc('add_loyalty_points', {
+      p_customer_id: customerId,
+      p_points: points,
+    });
+    if (error) throw error;
+  } catch (e) {
+    console.warn('[customerService] add_loyalty_points RPC:', e.message);
+  }
+}
+
+// Redeem 1000 loyalty points (apply ₹50 discount)
+export async function redeemLoyaltyPoints(customerId) {
+  try {
+    const { error } = await supabase.rpc('redeem_loyalty_points', {
+      p_customer_id: customerId,
+    });
+    if (error) throw error;
+  } catch (e) {
+    console.warn('[customerService] redeem_loyalty_points RPC:', e.message);
+  }
+}

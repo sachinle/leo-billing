@@ -24,6 +24,8 @@ dist-ssr
 *.sw?
 .env
 .env.*
+.claude
+
 
 android/app/google-services.json
 google-services.json

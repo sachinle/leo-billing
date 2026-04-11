@@ -158,6 +158,7 @@ export default function ViewInvoice() {
   const invoiceRef     = useRef();
   const downloadBtnRef = useRef();
 
+
   const addToast = (message, type = 'success') => {
     const tid = Date.now() + Math.random();
     setToasts(t => [...t, { id: tid, message, type }]);
@@ -659,6 +660,12 @@ const handlePaymentSubmit = async (payFull) => {
                 <span style={{color:'#70c49a'}}>−₹{fmtAmt(invoice.discount_total)}</span>
               </div>
             )}
+            {Number(invoice.loyalty_discount_applied) > 0 && (
+              <div className="vi__totals-row">
+                <span style={{color:'#c9a96e'}}>★ Loyalty Reward</span>
+                <span style={{color:'#c9a96e'}}>−₹{fmtAmt(invoice.loyalty_discount_applied)}</span>
+              </div>
+            )}
             <div className="vi__totals-row">
               <span>Received</span>
               <span>₹{fmtAmt(Number(invoice.amount_received) || 0)}</span>
@@ -673,6 +680,12 @@ const handlePaymentSubmit = async (payFull) => {
               <span>Total</span>
               <span>₹{fmtAmt(invoice.final_amount)}</span>
             </div>
+            {Number(invoice.loyalty_points_earned) > 0 && (
+              <div className="vi__totals-row" style={{ color:'#c9a96e', borderTop:'1px solid rgba(201,169,110,0.2)', marginTop:4, paddingTop:8 }}>
+                <span>★ Points Earned</span>
+                <span>+{invoice.loyalty_points_earned} pts</span>
+              </div>
+            )}
           </div>
 
           {/* Amount in words */}
@@ -823,6 +836,24 @@ const handlePaymentSubmit = async (payFull) => {
             <div className="ir__words-section">
               <div className="ir__section-header">Invoice Amount In Words</div>
               <div className="ir__words-text">{amountInWords}</div>
+              {/* Loyalty section in words column */}
+              {(Number(invoice.loyalty_points_earned) > 0 || Number(invoice.loyalty_discount_applied) > 0) && (
+                <div style={{ marginTop: 12, padding: '8px 10px', background: '#fffbf0', border: '1px solid #e8d89a', borderRadius: 6 }}>
+                  <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#9a7800', marginBottom: 4, letterSpacing: '0.05em' }}>
+                    ★ LOYALTY POINTS
+                  </div>
+                  {Number(invoice.loyalty_discount_applied) > 0 && (
+                    <div style={{ fontSize: '0.72rem', color: '#555', lineHeight: 1.6 }}>
+                      Reward Redeemed: −₹{fmtAmt(invoice.loyalty_discount_applied)} (1000 pts used)
+                    </div>
+                  )}
+                  {Number(invoice.loyalty_points_earned) > 0 && (
+                    <div style={{ fontSize: '0.72rem', color: '#555', lineHeight: 1.6 }}>
+                      Points Earned: +{invoice.loyalty_points_earned} pts
+                    </div>
+                  )}
+                </div>
+              )}
               <div style={{ marginTop: 16 }}>
                 <div className="ir__section-header" style={{ margin:'0 -28px 10px' }}>Terms and Conditions</div>
                 <div className="ir__words-text">{shop.terms}</div>
@@ -840,6 +871,12 @@ const handlePaymentSubmit = async (payFull) => {
                   <span className="ir__amount-val" style={{ color:'#c05050' }}>- ₹ {fmtAmt(invoice.discount_total)}</span>
                 </div>
               )}
+              {Number(invoice.loyalty_discount_applied) > 0 && (
+                <div className="ir__amount-row">
+                  <span style={{ color: '#9a7800' }}>★ Loyalty Reward</span>
+                  <span className="ir__amount-val" style={{ color:'#9a7800' }}>- ₹ {fmtAmt(invoice.loyalty_discount_applied)}</span>
+                </div>
+              )}
               <div className="ir__amount-row">
                 <span>Total</span>
                 <span className="ir__amount-val">₹ {fmtAmt(invoice.final_amount)}</span>
@@ -854,6 +891,12 @@ const handlePaymentSubmit = async (payFull) => {
                   ₹ {fmtAmt(amountDue)}
                 </span>
               </div>
+              {Number(invoice.loyalty_points_earned) > 0 && (
+                <div className="ir__amount-row" style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid #e8d89a', color: '#9a7800' }}>
+                  <span>★ Points Earned</span>
+                  <span className="ir__amount-val">+{invoice.loyalty_points_earned} pts</span>
+                </div>
+              )}
             </div>
           </div>
 

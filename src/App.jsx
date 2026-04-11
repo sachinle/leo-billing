@@ -22,6 +22,7 @@ const ViewInvoice    = lazy(() => import('./pages/ViewInvoice'));
 const Profile        = lazy(() => import('./pages/Profile'));
 const Settings       = lazy(() => import('./pages/Settings'));
 const PrinterSettings = lazy(() => import('./pages/PrinterSettings'));
+const AnalyticsPage  = lazy(() => import('./pages/Analytics'));
 
 // ── Shared loading spinner ───────────────────────────────────────────────────
 function Spinner() {
@@ -74,6 +75,7 @@ function AppRoutes() {
           <Route path="invoices/view/:id/print" element={<ThermalPrint />} />
           <Route path="invoices/view/:id"       element={<ViewInvoice />} />
           <Route path="invoices/edit/:id"       element={<EditInvoice />} />
+          <Route path="analytics"               element={<AnalyticsPage />} />
           <Route path="profile"                 element={<Profile />} />
           <Route path="settings"                element={<Settings />} />
           <Route path="printer"                 element={<PrinterSettings />} />

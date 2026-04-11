@@ -313,7 +313,7 @@
 }
 .ci__remove-btn:hover { background:rgba(224,112,112,0.1); color:#e07070; border-color:rgba(224,112,112,0.4); }
 
-/* Add item button */
+/* Add item button — bottom (desktop default) */
 .ci__add-item-btn {
   display: flex; align-items: center; justify-content: center; gap: 8px;
   padding: 11px 16px;
@@ -330,6 +330,15 @@
   background: rgba(201,169,110,0.07); box-shadow: 0 2px 8px rgba(201,169,110,0.1);
 }
 .ci__add-item-btn:active { transform: scale(0.99); }
+
+/* Inline Add Item button — shown inside card header on mobile */
+.ci__add-item-btn--inline {
+  display: none; /* hidden on desktop — desktop uses bottom button */
+  margin-top: 0; width: auto; padding: 6px 12px;
+  border-radius: 8px; border-style: solid; border-width: 1px;
+  font-size: 0.75rem; background: rgba(201,169,110,0.1);
+  border-color: rgba(201,169,110,0.3); color: var(--gold,#c9a96e);
+}
 
 /* ══════════════════════════════════════════
    MOBILE ITEM CARDS
@@ -559,7 +568,7 @@
    MOBILE (≤768px)
 ══════════════════════════════════════════ */
 @media (max-width: 768px) {
-  .create-invoice { padding: 16px 14px 120px; }
+  .create-invoice { padding: 16px 14px 200px; }
 
   /* Header — title block left, back btn top-right corner */
   .ci__header {
@@ -598,7 +607,9 @@
   .ci__items-table,
   .ci__items-table thead { display: none !important; }
   .ci__item-cards { display: block; }
-  .ci__add-item-btn { margin-top: 0; }
+  /* Bottom Add Item button hidden on mobile — inline header button used instead */
+  .ci__add-item-btn:not(.ci__add-item-btn--inline) { display: none; }
+  .ci__add-item-btn--inline { display: flex; }
 
   /* Compact item card fields */
   .ci__item-card { padding: 12px 12px 10px; }
@@ -625,7 +636,7 @@
    SMALL MOBILE (≤420px)
 ══════════════════════════════════════════ */
 @media (max-width: 420px) {
-  .create-invoice { padding: 12px 10px 120px; }
+  .create-invoice { padding: 12px 10px 200px; }
   .ci__item-card-grid { gap: 6px; }
   .ci__item-card-field input,
   .ci__item-card-field select { padding: 6px 8px; font-size: 0.78rem; height: 33px; }

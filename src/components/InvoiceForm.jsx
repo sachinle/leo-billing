@@ -4,50 +4,66 @@ import { searchCustomers } from '../services/customerService';
 import { useAuth } from '../hooks/useAuth';
 import ProductSearch from './ProductSearch';
 
-const UNITS = ['piece', 'box', 'pack', 'kg', 'gm', 'litre', 'ml', 'dozen', 'meter', 'set'];
+const UNITS = [
+  'piece','nos','kg','gm','litre','ml',
+  'dozen','pack','box','bag','bundle',
+  'carton','meter','set','bottle','can',
+  'plate','cup','pkt','item',
+];
 
-/* ── Mobile item card ────────────────────────────────────────────── */
+/* ── Mobile item card — redesigned for smooth 1-thumb billing ─────── */
 function MobileItemCard({ item, idx, onUpdate, onRemove, onSelect, onNew }) {
   const updateField = (field, val) => onUpdate(idx, field, val);
+  const total = parseFloat(item.total) || 0;
+  const price = parseFloat(item.price) || 0;
+  const qty   = parseFloat(item.quantity) || 0;
+
 
   return (
     <div className="ci__item-card">
+      {/* ── Header: item # + running total ── */}
       <div className="ci__item-card-header">
-        <span className="ci__item-card-num">Item {idx + 1}</span>
-        <span className="ci__item-card-total">
-          ₹{(parseFloat(item.total) || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span className="ci__item-card-num">#{idx + 1}</span>
+          {item.product_name && (
+            <span style={{ fontSize: '0.78rem', color: 'var(--text-muted,#6b6887)', fontFamily: 'DM Sans', maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {item.product_name}
+            </span>
+          )}
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span className="ci__item-card-total">
+            ₹{total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+          </span>
+          <button
+            className="ci__item-card-remove-icon"
+            onClick={() => onRemove(idx)}
+            style={{
+              background: 'rgba(224,112,112,0.1)', border: '1px solid rgba(224,112,112,0.2)',
+              color: '#e07070', borderRadius: 7, padding: '5px 7px', cursor: 'pointer', lineHeight: 0,
+            }}
+            title="Remove item"
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
       </div>
 
-      {/* Product name — full width */}
-      <div className="ci__item-card-grid">
-        <div className="ci__item-card-field ci__item-card-field--full">
-          <label>Product</label>
-          <ProductSearch
-            currentValue={item.product_name}
-            onSelect={(product) => onSelect(idx, product)}
-            onNewProduct={(name) => onNew(idx, name)}
-            onChange={(val) => updateField('product_name', val)}
-          />
-        </div>
+      {/* ── Product search — full width ── */}
+      <div className="ci__item-card-field ci__item-card-field--full" style={{ marginBottom: 8 }}>
+        <label>Product / Item</label>
+        <ProductSearch
+          currentValue={item.product_name}
+          onSelect={(product) => onSelect(idx, product)}
+          onNewProduct={(name) => onNew(idx, name)}
+          onChange={(val) => updateField('product_name', val)}
+        />
+      </div>
 
-        <div className="ci__item-card-field">
-          <label>Qty</label>
-          <input
-            type="number" inputMode="decimal"
-            value={item.quantity}
-            onChange={e => updateField('quantity', e.target.value)}
-            min="0" step="any" placeholder="1"
-          />
-        </div>
-
-        <div className="ci__item-card-field">
-          <label>Unit</label>
-          <select value={item.unit} onChange={e => updateField('unit', e.target.value)}>
-            {UNITS.map(u => <option key={u} value={u}>{u}</option>)}
-          </select>
-        </div>
-
+      {/* ── Price row ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 8 }}>
         <div className="ci__item-card-field">
           <label>Price (₹)</label>
           <input
@@ -55,9 +71,9 @@ function MobileItemCard({ item, idx, onUpdate, onRemove, onSelect, onNew }) {
             value={item.price}
             onChange={e => updateField('price', e.target.value)}
             min="0" step="0.01" placeholder="0.00"
+            style={{ fontSize: '1rem', fontWeight: 600 }}
           />
         </div>
-
         <div className="ci__item-card-field">
           <label>Discount (₹)</label>
           <input
@@ -69,12 +85,27 @@ function MobileItemCard({ item, idx, onUpdate, onRemove, onSelect, onNew }) {
         </div>
       </div>
 
-      <button className="ci__item-card-remove" onClick={() => onRemove(idx)}>
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <polyline points="3,6 5,6 21,6"/><path d="M19,6l-1,14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5,6"/><path d="M10,11v6"/><path d="M14,11v6"/>
-        </svg>
-        Remove Item
-      </button>
+      {/* ── Quantity + Unit row ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+        <div className="ci__item-card-field">
+          <label>Quantity</label>
+          <input
+            type="number" inputMode="decimal"
+            value={item.quantity}
+            onChange={e => updateField('quantity', e.target.value)}
+            min="0" step="any" placeholder="1"
+          />
+        </div>
+        <div className="ci__item-card-field">
+          <label>Unit</label>
+          <select
+            value={item.unit}
+            onChange={e => updateField('unit', e.target.value)}
+          >
+            {UNITS.map(u => <option key={u} value={u}>{u}</option>)}
+          </select>
+        </div>
+      </div>
     </div>
   );
 }
@@ -321,17 +352,30 @@ export default function InvoiceForm({ customer, setCustomer, items, setItems, pa
             <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
           </svg>
           <h3>Items</h3>
-          {items.length > 0 && (
-            <span style={{
-              marginLeft: 'auto', fontSize: '0.72rem', fontWeight: 600,
-              padding: '2px 8px', borderRadius: 6,
-              background: 'rgba(201,169,110,0.1)', color: 'var(--gold,#c9a96e)',
-              border: '1px solid rgba(201,169,110,0.2)',
-              fontFamily: 'DM Sans, sans-serif',
-            }}>
-              {items.length} item{items.length !== 1 ? 's' : ''}
-            </span>
-          )}
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
+            {items.length > 0 && (
+              <span style={{
+                fontSize: '0.72rem', fontWeight: 600,
+                padding: '2px 8px', borderRadius: 6,
+                background: 'rgba(201,169,110,0.1)', color: 'var(--gold,#c9a96e)',
+                border: '1px solid rgba(201,169,110,0.2)',
+                fontFamily: 'DM Sans, sans-serif',
+              }}>
+                {items.length} item{items.length !== 1 ? 's' : ''}
+              </span>
+            )}
+            {/* Mobile-only inline Add button in header — always visible */}
+            <button
+              className="ci__add-item-btn ci__add-item-btn--inline"
+              onClick={addItem}
+              type="button"
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              Add Item
+            </button>
+          </div>
         </div>
         <div className="ci__card-body">
 
@@ -416,7 +460,7 @@ export default function InvoiceForm({ customer, setCustomer, items, setItems, pa
             </table>
           </div>
 
-          {/* ── Mobile card list ── */}
+          {/* ── Mobile card list — newest item shown first so user never scrolls down ── */}
           <div className="ci__item-cards">
             {items.length === 0 && (
               <div style={{
@@ -424,10 +468,13 @@ export default function InvoiceForm({ customer, setCustomer, items, setItems, pa
                 color: 'var(--text-muted,#4e4b63)',
                 fontFamily: 'DM Sans,sans-serif', fontSize: '0.875rem',
               }}>
-                No items yet — tap "Add Item" below
+                No items yet — tap "Add Item" above
               </div>
             )}
-            {items.map((item, idx) => (
+            {items.map((item, idx) => ({ item, idx }))
+              .slice()
+              .reverse()
+              .map(({ item, idx }) => (
               <MobileItemCard
                 key={idx}
                 item={item}

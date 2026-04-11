@@ -1,0 +1,287 @@
+/* ══════════════════════════════════════════
+   Analytics Page — Leo Billing
+   Futuristic dark analytics dashboard
+══════════════════════════════════════════ */
+
+.an-page {
+  padding: 28px 28px 60px;
+  max-width: 1100px;
+  margin: 0 auto;
+  animation: fadeUp 0.4s cubic-bezier(0.16,1,0.3,1) both;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Header ── */
+.an__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.an__eyebrow {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold, #c9a96e);
+  font-family: 'DM Sans', sans-serif;
+  margin: 0 0 6px;
+}
+
+.an__title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  font-family: 'Playfair Display', serif;
+  color: var(--text-primary, #f0ece4);
+  margin: 0 0 4px;
+  line-height: 1.1;
+}
+
+.an__subtitle {
+  font-size: 0.82rem;
+  color: var(--text-muted, #6b6887);
+  font-family: 'DM Sans', sans-serif;
+  margin: 0;
+}
+
+/* ── Period tabs ── */
+.an__period-tabs {
+  display: flex;
+  gap: 4px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border, rgba(201,169,110,0.15));
+  border-radius: 10px;
+  padding: 3px;
+}
+
+.an__period-tab {
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted, #6b6887);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.an__period-tab:hover { color: var(--text-primary, #f0ece4); }
+
+.an__period-tab--active {
+  background: var(--gold, #c9a96e);
+  color: #0a0808;
+  font-weight: 700;
+}
+
+/* ── KPI grid ── */
+.an__kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.an__kpi {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 18px 16px;
+  background: var(--card, #14141c);
+  border: 1px solid var(--border, rgba(201,169,110,0.15));
+  border-radius: 14px;
+  animation: kpiIn 0.4s cubic-bezier(0.16,1,0.3,1) both;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.an__kpi:hover {
+  border-color: rgba(201,169,110,0.3);
+  transform: translateY(-1px);
+}
+
+@keyframes kpiIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.an__kpi-icon {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  border: 1px solid;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.an__kpi-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted, #6b6887);
+  font-family: 'DM Sans', sans-serif;
+  margin: 0 0 4px;
+}
+
+.an__kpi-value {
+  font-size: 1.3rem;
+  font-weight: 700;
+  font-family: 'Playfair Display', serif;
+  margin: 0 0 2px;
+  line-height: 1.1;
+}
+
+.an__kpi-sub {
+  font-size: 0.68rem;
+  color: var(--text-muted, #6b6887);
+  font-family: 'DM Sans', sans-serif;
+  margin: 0;
+}
+
+/* ── Growth badge ── */
+.an__growth-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.an__growth-badge--up {
+  background: rgba(112,196,154,0.1);
+  color: #70c49a;
+  border: 1px solid rgba(112,196,154,0.3);
+}
+
+.an__growth-badge--down {
+  background: rgba(224,112,112,0.1);
+  color: #e07070;
+  border: 1px solid rgba(224,112,112,0.3);
+}
+
+/* ── Chart rows ── */
+.an__charts-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.an__chart-card {
+  background: var(--card, #14141c);
+  border: 1px solid var(--border, rgba(201,169,110,0.15));
+  border-radius: 14px;
+  padding: 20px;
+  animation: fadeUp 0.5s cubic-bezier(0.16,1,0.3,1) both;
+}
+
+.an__chart-card--wide { grid-column: 1; }
+
+.an__chart-card--full {
+  grid-column: 1 / -1;
+  margin-bottom: 16px;
+}
+
+.an__chart-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.an__chart-title {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-primary, #f0ece4);
+  font-family: 'DM Sans', sans-serif;
+  margin: 0 0 2px;
+}
+
+.an__chart-sub {
+  font-size: 0.72rem;
+  color: var(--text-muted, #6b6887);
+  font-family: 'DM Sans', sans-serif;
+  margin: 0;
+}
+
+/* ── Skeleton loader ── */
+.an__skeleton {
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0.04) 25%,
+    rgba(255,255,255,0.08) 50%,
+    rgba(255,255,255,0.04) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to   { background-position: 200% 0; }
+}
+
+/* ══════════════════════════════════════════
+   LIGHT THEME
+══════════════════════════════════════════ */
+[data-theme="light"] .an__kpi,
+[data-theme="light"] .an__chart-card {
+  background: #ffffff;
+  border-color: rgba(0,0,0,0.08);
+}
+
+[data-theme="light"] .an__period-tabs {
+  background: rgba(0,0,0,0.04);
+  border-color: rgba(0,0,0,0.1);
+}
+
+[data-theme="light"] .an__period-tab--active {
+  background: #c9a96e;
+  color: #fff;
+}
+
+/* ══════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .an-page { padding: 16px 14px 80px; }
+
+  .an__header { flex-direction: column; align-items: flex-start; }
+  .an__title { font-size: 1.4rem; }
+
+  .an__kpi-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .an__kpi { padding: 14px 12px; gap: 10px; }
+  .an__kpi-value { font-size: 1.1rem; }
+  .an__kpi-icon { width: 32px; height: 32px; }
+
+  .an__charts-row { grid-template-columns: 1fr; }
+  .an__chart-card--wide { grid-column: 1; }
+  .an__chart-card { padding: 16px; }
+}
+
+@media (max-width: 420px) {
+  .an__kpi-grid { grid-template-columns: 1fr 1fr; }
+  .an__kpi { flex-direction: column; gap: 6px; }
+  .an__kpi-icon { display: none; }
+}
+
+/* ── Time of day grid — 4 cols desktop, 2x2 on mobile ── */
+.an__time-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+@media (max-width: 600px) {
+  .an__time-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

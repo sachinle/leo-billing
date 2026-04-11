@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { useAuth } from '../hooks/useAuth';
 import { getInvoices, searchInvoices, deleteInvoice, duplicateInvoice } from '../services/invoiceService';
 import { markInvoicePaid } from '../services/profileService';
@@ -83,7 +84,7 @@ function Toast({ toasts }) {
 
 function ConfirmDialog({ open, title, message, confirmLabel, confirmClass, onConfirm, onCancel }) {
   if (!open) return null;
-  return (
+  return createPortal(
     <div className="dialog-overlay" onClick={onCancel}>
       <div className="dialog" onClick={e => e.stopPropagation()}>
         <div className="dialog__icon">
@@ -99,7 +100,8 @@ function ConfirmDialog({ open, title, message, confirmLabel, confirmClass, onCon
           <button className={`dialog__confirm ${confirmClass || ''}`} onClick={onConfirm}>{confirmLabel || 'Confirm'}</button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

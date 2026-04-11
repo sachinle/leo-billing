@@ -7,6 +7,7 @@ import {
   deleteProduct,
   searchProducts,
 } from '../services/productService';
+import { getStockEnabled } from './Settings';
 import './Products.css';
 
 // ── Helpers ──────────────────────────────────────────────────
@@ -273,6 +274,7 @@ export default function Products() {
   const [toasts, setToasts] = useState([]);
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [tableColumns, setTableColumns] = useState(['name', 'price']);
+  const stockEnabled = getStockEnabled();
   const searchTimer = useRef(null);
 
   // ── Toast ──
@@ -338,7 +340,7 @@ export default function Products() {
 
   // ── Build payload — only send columns that exist ──
   const buildPayload = (form) => {
-    const has = (col) => tableColumns.includes(col);
+    const has = (col) => tableColumns.includes(col); // for payload: always include stock if column exists
     const payload = {
       name:  form.name.trim(),
       price: parseFloat(form.price) || 0,
@@ -415,7 +417,11 @@ export default function Products() {
   );
 
   // ── Stats ──
-  const has = (col) => tableColumns.includes(col);
+  // has() respects the stock toggle from Settings
+  const has = (col) => {
+    if (col === 'stock' && !stockEnabled) return false;
+    return tableColumns.includes(col);
+  };
   const totalValue     = products.reduce((s, p) => s + (Number(p.price) || 0), 0);
   const totalStock     = has('stock') ? products.reduce((s, p) => s + (Number(p.stock) || 0), 0) : null;
   const lowStockCount  = has('stock') ? products.filter(p => Number(p.stock) > 0 && Number(p.stock) <= 10).length : null;
