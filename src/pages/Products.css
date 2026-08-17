@@ -790,3 +790,119 @@
   .products__table th:nth-child(8),
   .products__table td:nth-child(8) { display: none; }
 }
+/* ══════════════════════════════════════════════════════════════
+   Website publishing fields — appended for the storefront
+   integration. Purely additive: no existing selector is modified.
+   ══════════════════════════════════════════════════════════════ */
+
+.drawer__section {
+  border-top: 1px solid var(--border, rgba(255,255,255,0.08));
+  padding-top: 16px;
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.drawer__section-title {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.6;
+  margin: 0;
+}
+
+.drawer__check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+.drawer__check input { margin-top: 3px; flex-shrink: 0; }
+.drawer__check span { display: flex; flex-direction: column; gap: 2px; }
+.drawer__check em {
+  font-style: normal;
+  font-size: 0.75rem;
+  opacity: 0.55;
+}
+
+.drawer__hint {
+  margin: 6px 0 0;
+  font-size: 0.75rem;
+  opacity: 0.6;
+  word-break: break-word;
+}
+.drawer__hint--ok  { color: #4ade80; opacity: 0.9; }
+.drawer__hint--err { color: #f87171; opacity: 1; }
+
+.img-preview {
+  position: relative;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  overflow: hidden;
+  max-width: 220px;
+}
+.img-preview img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+.img-preview__remove {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  padding: 4px 10px;
+  font-size: 0.7rem;
+  border: none;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  cursor: pointer;
+}
+
+.variant-row {
+  display: grid;
+  grid-template-columns: 1fr 110px 32px;
+  gap: 8px;
+  margin-bottom: 8px;
+  align-items: center;
+}
+.variant-row__remove {
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(248, 113, 113, 0.12);
+  color: #f87171;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.variant-add {
+  padding: 8px 14px;
+  font-size: 0.8rem;
+  border: 1px dashed var(--border, rgba(255,255,255,0.18));
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  opacity: 0.75;
+  cursor: pointer;
+}
+.variant-add:hover { opacity: 1; }
+
+.badge--live {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 7px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  border-radius: 999px;
+  background: rgba(74, 222, 128, 0.15);
+  color: #4ade80;
+  vertical-align: middle;
+}

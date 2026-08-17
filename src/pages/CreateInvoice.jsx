@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { linkOrderInvoice } from '../services/websiteService';
 import { generateInvoiceNo } from '../utils/generateInvoiceNo';
 import { createInvoice } from '../services/invoiceService';
 import { addProduct, searchProducts } from '../services/productService';
@@ -29,6 +30,13 @@ function Toast({ toasts }) {
 export default function CreateInvoice() {
   const { user }  = useAuth();
   const navigate  = useNavigate();
+  const location  = useLocation();
+
+  // Set when arriving via "Make Invoice" on a website order. Everything
+  // below behaves exactly as a normal manual invoice — this only
+  // pre-fills the form and, once saved, links the invoice back to the
+  // order so the customer can see their bill.
+  const fromOrder = location.state?.fromOrder ?? null;
 
   // Stable invoice number & time for this session
   const [invoiceNo]  = useState(() => generateInvoiceNo());
@@ -37,8 +45,12 @@ export default function CreateInvoice() {
 const today = new Date().toLocaleDateString('en-CA');
   const fmtDateDisplay = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
 
-  const [customer, setCustomer]               = useState({ name: '', phone: '', id: null, isExisting: false });
-  const [items, setItems]                     = useState([]);
+  const [customer, setCustomer]               = useState(() =>
+    fromOrder
+      ? { name: fromOrder.customerName || '', phone: fromOrder.customerPhone || '', id: null, isExisting: false }
+      : { name: '', phone: '', id: null, isExisting: false }
+  );
+  const [items, setItems]                     = useState(() => (fromOrder?.items ?? []));
   const [paymentStatus, setPaymentStatus]     = useState('paid'); // 'paid' | 'unpaid'
   const [saving, setSaving]                   = useState(false);
   const [toasts, setToasts]                   = useState([]);
@@ -160,6 +172,22 @@ const today = new Date().toLocaleDateString('en-CA');
 
       const saved = await createInvoice(user.uid, invoiceData, dbItems);
       addToast('Invoice saved successfully!');
+
+      // Link the invoice back to the website order so the customer can
+      // see their bill. Best-effort: the invoice is already saved, so a
+      // failure here must not look like the invoice failed.
+      if (fromOrder?.orderId) {
+        try {
+          await linkOrderInvoice(fromOrder.orderId, saved.id);
+        } catch (linkErr) {
+          addToast(
+            'Invoice saved, but linking it to the website order failed: ' +
+              (linkErr.message || 'unknown error'),
+            'error'
+          );
+        }
+      }
+
       setTimeout(() => navigate(`/invoices/view/${saved.id}`), 900);
     } catch (err) {
       addToast('Error: ' + (err.message || 'Failed to save'), 'error');

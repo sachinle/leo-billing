@@ -8,6 +8,8 @@ import {
   searchProducts,
 } from '../services/productService';
 import { getStockEnabled } from './Settings';
+import { uploadProductImage, deleteProductImage } from '../services/productImageService';
+import { formatBytes } from '../utils/imageCompress';
 import './Products.css';
 
 // ── Helpers ──────────────────────────────────────────────────
@@ -38,6 +40,28 @@ const GST_RATES = [0, 5, 12, 18, 28];
 
 // Category options
 const CATEGORIES = ['Electronics', 'Food & Beverage', 'Clothing', 'Stationery', 'Hardware', 'Medicine', 'Other'];
+
+// Storefront categories — used only by the public website, kept separate
+// from the billing `category` above so existing invoices/filters are
+// unaffected.
+const WEBSITE_CATEGORIES = [
+  'Ice Cakes', 'Regular Cakes', 'Bento Cakes', 'Cup Cakes',
+  'Brownies', 'Tea Cakes', 'Biscuits', 'Chocolates', 'Other',
+];
+
+// Common HSN codes for a home bakery. Free text is still allowed —
+// this is a convenience list, not a restriction.
+const HSN_SUGGESTIONS = [
+  { code: '1905', label: '1905 — Bakery: cakes, biscuits, pastries' },
+  { code: '1806', label: '1806 — Chocolate & cocoa preparations' },
+  { code: '2106', label: '2106 — Other food preparations' },
+];
+
+const slugify = (s) =>
+  String(s || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
 
 // Stock badge
 const StockBadge = ({ stock }) => {
@@ -90,11 +114,20 @@ function ConfirmDialog({ open, message, onConfirm, onCancel }) {
 const EMPTY_FORM = {
   name: '', price: '', description: '',
   unit: 'pcs', stock: '', category: '', gst_rate: '0',
+  // ── Tax / inventory ──
+  hsn_code: '', track_stock: false, low_stock_threshold: '5',
+  // ── Website fields ──
+  is_published: false, is_featured: false,
+  slug: '', short_description: '', website_category: '',
+  variants: [], image_url: '', image_path: '',
 };
 
 function ProductDrawer({ open, onClose, onSave, initial, columns }) {
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadNote, setUploadNote] = useState('');
+  const [uploadError, setUploadError] = useState('');
   // Two-stage open: mounted puts element in DOM, visible triggers CSS transition.
   // The rAF gap gives the browser one paint frame so the transition actually
   // runs smoothly instead of jumping straight to the end state.
@@ -122,7 +155,20 @@ function ProductDrawer({ open, onClose, onSave, initial, columns }) {
         stock:       initial.stock       ?? '',
         category:    initial.category    || '',
         gst_rate:    initial.gst_rate    ?? '0',
+        hsn_code:            initial.hsn_code            || '',
+        track_stock:         initial.track_stock         ?? false,
+        low_stock_threshold: initial.low_stock_threshold ?? '5',
+        is_published:        initial.is_published        ?? false,
+        is_featured:         initial.is_featured         ?? false,
+        slug:                initial.slug                || '',
+        short_description:   initial.short_description   || '',
+        website_category:    initial.website_category    || '',
+        variants:   Array.isArray(initial.variants) ? initial.variants : [],
+        image_url:  initial.image_url  || '',
+        image_path: initial.image_path || '',
       } : EMPTY_FORM);
+      setUploadNote('');
+      setUploadError('');
     } else {
       // Restore page scroll when drawer closes
       document.body.style.overflow = '';
@@ -137,6 +183,46 @@ function ProductDrawer({ open, onClose, onSave, initial, columns }) {
   }, [open, initial]);
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  // ── Product photo (website) ──
+  const handleImagePick = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = ''; // allow re-picking the same file
+    if (!file) return;
+
+    setUploadError('');
+    setUploadNote('');
+    setUploading(true);
+    try {
+      const res = await uploadProductImage(file);
+      const oldPath = form.image_path;
+      set('image_url', res.publicUrl);
+      set('image_path', res.path);
+      setUploadNote(
+        `Optimised ${formatBytes(res.originalBytes)} → ${formatBytes(res.compressedBytes)}`
+      );
+      // Clean up the replaced file so storage doesn't fill with orphans.
+      if (oldPath) deleteProductImage(oldPath).catch(() => {});
+    } catch (err) {
+      setUploadError(getErrMsg(err));
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleImageRemove = () => {
+    const oldPath = form.image_path;
+    set('image_url', '');
+    set('image_path', '');
+    setUploadNote('');
+    if (oldPath) deleteProductImage(oldPath).catch(() => {});
+  };
+
+  // ── Website size options ──
+  const addVariant    = () => set('variants', [...form.variants, { label: '', price: '' }]);
+  const removeVariant = (i) => set('variants', form.variants.filter((_, idx) => idx !== i));
+  const setVariant    = (i, key, val) =>
+    set('variants', form.variants.map((v, idx) => (idx === i ? { ...v, [key]: val } : v)));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -233,6 +319,142 @@ function ProductDrawer({ open, onClose, onSave, initial, columns }) {
               <label>Description <span className="optional">optional</span></label>
               <textarea rows={3} placeholder="Brief product description…"
                 value={form.description} onChange={e => set('description', e.target.value)} />
+            </div>
+          )}
+
+          {/* ── Tax & inventory ────────────────────────────── */}
+          {(has('hsn_code') || has('track_stock')) && (
+            <div className="drawer__section">
+              <p className="drawer__section-title">Tax &amp; Inventory</p>
+
+              {has('hsn_code') && (
+                <div className="drawer__field">
+                  <label>HSN Code <span className="optional">for GST invoices</span></label>
+                  <input type="text" list="hsn-list" placeholder="e.g. 1905"
+                    value={form.hsn_code} onChange={e => set('hsn_code', e.target.value)} />
+                  <datalist id="hsn-list">
+                    {HSN_SUGGESTIONS.map(h => <option key={h.code} value={h.code}>{h.label}</option>)}
+                  </datalist>
+                </div>
+              )}
+
+              {has('track_stock') && (
+                <>
+                  <label className="drawer__check">
+                    <input type="checkbox" checked={!!form.track_stock}
+                      onChange={e => set('track_stock', e.target.checked)} />
+                    <span>
+                      Track stock for this product
+                      <em>Invoicing it will reduce the stock count. Leave off for made-to-order cakes.</em>
+                    </span>
+                  </label>
+
+                  {form.track_stock && (
+                    <div className="drawer__field">
+                      <label>Low stock warning at</label>
+                      <input type="number" min="0" placeholder="5"
+                        value={form.low_stock_threshold}
+                        onChange={e => set('low_stock_threshold', e.target.value)} />
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          )}
+
+          {/* ── Website ────────────────────────────────────── */}
+          {has('is_published') && (
+            <div className="drawer__section">
+              <p className="drawer__section-title">Website</p>
+
+              <label className="drawer__check">
+                <input type="checkbox" checked={!!form.is_published}
+                  onChange={e => {
+                    const on = e.target.checked;
+                    set('is_published', on);
+                    // Generate a URL slug on first publish if empty.
+                    if (on && !form.slug && form.name) set('slug', slugify(form.name));
+                  }} />
+                <span>
+                  Show this product on the website
+                  <em>Off by default. Delivery charges, toppers and test items should stay off.</em>
+                </span>
+              </label>
+
+              {form.is_published && (
+                <>
+                  <label className="drawer__check">
+                    <input type="checkbox" checked={!!form.is_featured}
+                      onChange={e => set('is_featured', e.target.checked)} />
+                    <span>Feature on the homepage</span>
+                  </label>
+
+                  {/* Photo */}
+                  <div className="drawer__field">
+                    <label>Product Photo</label>
+                    {form.image_url ? (
+                      <div className="img-preview">
+                        <img src={form.image_url} alt="" />
+                        <button type="button" className="img-preview__remove"
+                          onClick={handleImageRemove}>Remove</button>
+                      </div>
+                    ) : (
+                      <p className="drawer__hint">No photo yet — the website will show a placeholder.</p>
+                    )}
+                    <input type="file" accept="image/jpeg,image/png,image/webp"
+                      disabled={uploading} onChange={handleImagePick} />
+                    {uploading  && <p className="drawer__hint">Optimising and uploading…</p>}
+                    {uploadNote && <p className="drawer__hint drawer__hint--ok">{uploadNote}</p>}
+                    {uploadError && <p className="drawer__hint drawer__hint--err">{uploadError}</p>}
+                  </div>
+
+                  <div className="drawer__field">
+                    <label>Website Category</label>
+                    <select value={form.website_category}
+                      onChange={e => set('website_category', e.target.value)}>
+                      <option value="">— Select —</option>
+                      {WEBSITE_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                  </div>
+
+                  <div className="drawer__field">
+                    <label>Short Description <span className="optional">shown under the name</span></label>
+                    <input type="text" maxLength={140} placeholder="e.g. Fresh cream, layered with black currant"
+                      value={form.short_description}
+                      onChange={e => set('short_description', e.target.value)} />
+                  </div>
+
+                  <div className="drawer__field">
+                    <label>Page URL</label>
+                    <input type="text" placeholder="black-currant-ice-cake"
+                      value={form.slug} onChange={e => set('slug', slugify(e.target.value))} />
+                    <p className="drawer__hint">/cakes/{form.slug || '…'}</p>
+                  </div>
+
+                  {/* Sizes the customer can choose */}
+                  <div className="drawer__field">
+                    <label>Sizes &amp; Prices <span className="optional">what the customer actually pays</span></label>
+                    {form.variants.length === 0 && (
+                      <p className="drawer__hint">
+                        No sizes added — the website shows the single price above.
+                      </p>
+                    )}
+                    {form.variants.map((v, i) => (
+                      <div className="variant-row" key={i}>
+                        <input type="text" placeholder="1 kg"
+                          value={v.label} onChange={e => setVariant(i, 'label', e.target.value)} />
+                        <input type="number" min="0" step="0.01" placeholder="800"
+                          value={v.price} onChange={e => setVariant(i, 'price', e.target.value)} />
+                        <button type="button" className="variant-row__remove"
+                          onClick={() => removeVariant(i)} aria-label="Remove size">×</button>
+                      </div>
+                    ))}
+                    <button type="button" className="variant-add" onClick={addVariant}>
+                      + Add a size
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           )}
 
@@ -350,6 +572,29 @@ export default function Products() {
     if (has('stock'))       payload.stock    = parseInt(form.stock) || 0;
     if (has('category') && form.category)    payload.category = form.category;
     if (has('gst_rate'))    payload.gst_rate = parseFloat(form.gst_rate) || 0;
+
+    // ── Tax / inventory ──
+    if (has('hsn_code'))    payload.hsn_code    = form.hsn_code?.trim() || null;
+    if (has('track_stock')) payload.track_stock = !!form.track_stock;
+    if (has('low_stock_threshold')) {
+      payload.low_stock_threshold = parseInt(form.low_stock_threshold) || 5;
+    }
+
+    // ── Website ──
+    if (has('is_published')) payload.is_published = !!form.is_published;
+    if (has('is_featured'))  payload.is_featured  = !!form.is_featured;
+    if (has('slug'))              payload.slug              = form.slug?.trim() || null;
+    if (has('short_description')) payload.short_description = form.short_description?.trim() || null;
+    if (has('website_category'))  payload.website_category  = form.website_category || null;
+    if (has('image_url'))         payload.image_url         = form.image_url  || null;
+    if (has('image_path'))        payload.image_path        = form.image_path || null;
+    if (has('variants')) {
+      // Drop incomplete rows and coerce prices, so the website never
+      // receives a size with a blank or non-numeric price.
+      payload.variants = (form.variants || [])
+        .filter(v => String(v.label).trim() && v.price !== '' && v.price !== null)
+        .map(v => ({ label: String(v.label).trim(), price: parseFloat(v.price) || 0 }));
+    }
     return payload;
   };
 
@@ -612,7 +857,10 @@ export default function Products() {
                           </svg>
                         </div>
                         <div>
-                          <p className="product-name">{p.name}</p>
+                          <p className="product-name">
+                            {p.name}
+                            {p.is_published && <span className="badge badge--live">Live</span>}
+                          </p>
                           {has('description') && p.description && (
                             <p className="product-desc">{p.description}</p>
                           )}

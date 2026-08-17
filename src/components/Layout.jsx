@@ -13,9 +13,13 @@ import PrinterSettings from '../pages/PrinterSettings';
 import Settings from '../pages/Settings';
 import Profile from '../pages/Profile';
 import Analytics from '../pages/Analytics';
+import Website from '../pages/Website';
+import { useAuth } from '../hooks/useAuth';
+import { canManageWebsite } from '../services/permissions';
 import './Layout.css';
 
 export default function Layout() {
+  const { user } = useAuth();
   const [collapsed, setCollapsed]     = useState(false);
   const [mobileOpen, setMobileOpen]   = useState(false);
   const [isMobile, setIsMobile]       = useState(window.innerWidth <= 768);
@@ -87,6 +91,10 @@ export default function Layout() {
           <Route path="/invoices/edit/:id" element={<EditInvoice />} />
           <Route path="/invoices/view/:id" element={<ViewInvoice />} />
           <Route path="/invoices/view/:id/print" element={<ThermalPrint />} />
+          <Route
+            path="/website"
+            element={canManageWebsite(user) ? <Website /> : <Navigate to="/dashboard" replace />}
+          />
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/printer" element={<PrinterSettings />} />

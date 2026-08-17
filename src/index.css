@@ -13,8 +13,49 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  /* Prevent system color-scheme from overriding our theme */
-  color-scheme: only dark;
+  /* Follow the app's own theme, not the operating system's. This has to
+     track [data-theme] rather than being pinned to dark: it controls how
+     the browser paints native widgets — dropdown popups, date pickers,
+     autofilled fields, scrollbars — and pinning it to dark left those
+     rendering dark while the rest of the page was light. */
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+}
+
+/* ── Form controls: readable in both themes ───────────────────────
+   Page stylesheets commonly set `background: transparent` on inputs and
+   selects so they blend into a card. That works for the closed control,
+   but a <select>'s dropdown popup is painted by the browser and cannot
+   inherit a transparent background — it falls back to white, while the
+   option text still inherits the theme's colour. In dark mode that is
+   pale text on a white popup, which is unreadable.
+
+   Styling <option> directly fixes it. These are bare element selectors
+   (specificity 0,0,1), so any existing class-based rule still wins and
+   no current design changes. */
+option {
+  background-color: var(--card, #14141c);
+  color: var(--text-primary, #f0ece4);
+}
+
+/* Same reasoning for autofilled inputs, which Chrome repaints with its
+   own background and would otherwise hide the value. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text-primary, #f0ece4);
+  -webkit-box-shadow: 0 0 0 1000px var(--card, #14141c) inset;
+  caret-color: var(--text-primary, #f0ece4);
+}
+
+/* Placeholder text needs a deliberate colour in both themes — the
+   browser default is tuned for a white page and vanishes on dark. */
+::placeholder {
+  color: var(--text-muted, #8f8e96);
+  opacity: 1;
 }
 
 /* Let our Login component's [data-theme] handle colors */
