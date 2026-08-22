@@ -1,0 +1,218 @@
+/* Receive Payment — counter payment screen.
+   Uses the same tokens as the rest of the app so it inherits both
+   themes without a second set of colours. */
+
+.rp { padding: 20px 18px 40px; max-width: 1000px; margin: 0 auto; }
+
+.rp__title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+.rp__sub { margin: 6px 0 22px; color: var(--text-muted); font-size: 0.92rem; }
+
+.rp__error {
+  background: var(--error-bg);
+  color: var(--error-color);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  font-size: 0.9rem;
+}
+
+.rp__grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 860px) {
+  .rp__grid { grid-template-columns: 1fr 360px; align-items: start; }
+}
+
+.rp__panel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+}
+.rp__panel--qr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: sticky;
+  top: 16px;
+}
+
+.rp__label {
+  display: block;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin: 18px 0 8px;
+}
+.rp__label:first-child { margin-top: 0; }
+
+.rp__amount-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 14px;
+  background: var(--input-bg);
+}
+.rp__rupee { font-size: 1.5rem; color: var(--text-muted); }
+.rp__amount {
+  flex: 1;
+  border: 0;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 2rem;
+  font-weight: 700;
+  outline: none;
+  width: 100%;
+  min-width: 0;
+}
+/* Spinners on a money field are a mis-tap waiting to happen. */
+.rp__amount::-webkit-outer-spin-button,
+.rp__amount::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.rp__amount { -moz-appearance: textfield; }
+
+.rp__quick { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.rp__chip {
+  border: 1px solid var(--border);
+  background: var(--input-bg);
+  color: var(--text-primary);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.rp__chip:hover { border-color: var(--gold); color: var(--gold); }
+.rp__chip--clear { color: var(--text-muted); }
+
+.rp__input {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: var(--input-bg);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  outline: none;
+}
+.rp__input:focus { border-color: var(--gold); }
+
+.rp__accounts { display: grid; gap: 8px; }
+.rp__account {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: var(--input-bg);
+  cursor: pointer;
+  text-align: left;
+}
+.rp__account.is-selected { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold); }
+.rp__account-label { font-weight: 600; color: var(--text-primary); font-size: 0.9rem; }
+.rp__account-vpa { color: var(--text-muted); font-size: 0.8rem; }
+
+.rp__qr {
+  width: 100%;
+  max-width: 280px;
+  aspect-ratio: 1;
+  /* White plate behind the code: a dark-theme background under a QR
+     kills the contrast scanners rely on. */
+  background: #fff;
+  border-radius: 12px;
+  padding: 10px;
+}
+.rp__qr-amount { font-size: 1.6rem; font-weight: 700; color: var(--text-primary); margin: 14px 0 2px; }
+.rp__qr-vpa { font-size: 0.82rem; color: var(--text-muted); margin: 0; word-break: break-all; }
+.rp__qr-hint { font-size: 0.8rem; color: var(--text-muted); margin-top: 10px; }
+.rp__qr-placeholder {
+  width: 100%; max-width: 280px; aspect-ratio: 1;
+  display: grid; place-items: center;
+  border: 1px dashed var(--border); border-radius: 12px;
+  color: var(--text-muted); font-size: 0.85rem;
+}
+
+.rp__empty {
+  background: var(--card);
+  border: 1px dashed var(--border);
+  border-radius: 16px;
+  padding: 36px 24px;
+  text-align: center;
+  color: var(--text-primary);
+}
+.rp__empty-sub { color: var(--text-muted); font-size: 0.9rem; margin-top: 6px; }
+
+.rp__disclaimer {
+  margin-top: 20px;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.rp__skeleton { height: 320px; border-radius: 16px; background: var(--card); }
+
+/* ── UPI accounts editor (Profile page) ───────────────────── */
+.upi-editor { margin-top: 6px; }
+.upi-editor__empty, .upi-editor__hint {
+  color: var(--text-muted); font-size: 0.85rem; margin: 6px 0;
+}
+.upi-editor__error { color: var(--error-color); font-size: 0.83rem; margin: 8px 0 0; }
+
+.upi-editor__list { list-style: none; padding: 0; margin: 0 0 12px; display: grid; gap: 8px; }
+.upi-editor__row {
+  display: flex; align-items: center; gap: 12px;
+  border: 1px solid var(--border); border-radius: 12px;
+  padding: 10px 12px; background: var(--input-bg);
+}
+.upi-editor__row.is-on { border-color: var(--gold); }
+.upi-editor__info { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.upi-editor__label { font-weight: 600; font-size: 0.88rem; color: var(--text-primary); }
+.upi-editor__vpa { font-size: 0.78rem; color: var(--text-muted); word-break: break-all; }
+.upi-editor__state { font-size: 0.75rem; color: var(--text-muted); }
+.upi-editor__remove {
+  border: 0; background: transparent; color: var(--text-muted);
+  font-size: 1.3rem; line-height: 1; cursor: pointer; padding: 0 4px;
+}
+.upi-editor__remove:hover { color: var(--error-color); }
+
+.upi-editor__toggle { position: relative; display: inline-flex; }
+.upi-editor__toggle input { position: absolute; opacity: 0; width: 0; height: 0; }
+.upi-editor__toggle span {
+  width: 38px; height: 22px; border-radius: 999px;
+  background: var(--border); display: inline-block; position: relative;
+  transition: background 0.18s; cursor: pointer;
+}
+.upi-editor__toggle span::after {
+  content: ''; position: absolute; top: 3px; left: 3px;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: #fff; transition: transform 0.18s;
+}
+.upi-editor__toggle input:checked + span { background: var(--gold); }
+.upi-editor__toggle input:checked + span::after { transform: translateX(16px); }
+
+.upi-editor__add { display: flex; flex-wrap: wrap; gap: 8px; }
+.upi-editor__add input {
+  flex: 1; min-width: 130px;
+  border: 1px solid var(--border); border-radius: 10px;
+  padding: 10px 12px; background: var(--input-bg); color: var(--text-primary);
+  font-size: 0.9rem; outline: none;
+}
+.upi-editor__add input:focus { border-color: var(--gold); }
+.upi-editor__add button {
+  border: 0; border-radius: 10px; padding: 10px 18px;
+  background: var(--gold); color: #fff; font-weight: 600;
+  font-size: 0.88rem; cursor: pointer;
+}
+.upi-editor__add button:disabled { opacity: 0.45; cursor: not-allowed; }

@@ -663,3 +663,32 @@
 .ir__powered-dot { color: #be1b1b; font-style: normal; font-weight: 900; }
 [data-theme="light"] .ir__powered-text { color: #be1b1b; }
 [data-theme="light"] .ir__powered-dot  { color: #be1b1b; }
+
+/* ── Scan-to-pay QR on an unpaid invoice ─────────────────── */
+.vi__payqr-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 16px;
+}
+.vi__payqr-img {
+  width: 190px;
+  height: 190px;
+  /* White plate: a dark card behind a QR destroys the contrast that
+     phone scanners depend on. */
+  background: #fff;
+  border-radius: 10px;
+  padding: 8px;
+}
+.vi__payqr-note {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+/* Kept out of the printed/exported invoice — the PDF is a record of the
+   bill, and a live payment code on an archived document is a trap. */
+@media print {
+  .vi__payqr { display: none !important; }
+}

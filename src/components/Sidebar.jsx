@@ -48,6 +48,10 @@ const NAV_ITEMS = [
     icon: <Icon><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></Icon>,
   },
   {
+    to: '/receive-payment', label: 'Receive Payment',
+    icon: <Icon><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><path d="M14 3h3v3"/><path d="M21 3v0"/><path d="M3 14h3v3"/><path d="M17 17h4"/><path d="M17 21h4"/></Icon>,
+  },
+  {
     to: '/website', label: 'Website',
     icon: <Icon><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></Icon>,
   },

@@ -1,4 +1,7 @@
 import { useState, useEffect, useRef, Fragment } from 'react';
+import QRCode from 'qrcode';
+import { supabase } from '../services/supabase';
+import { buildUpiUri, enabledUpiAccounts } from '../utils/upi';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { getInvoiceWithItems, markInvoicePayment } from '../services/invoiceService';
@@ -155,6 +158,55 @@ export default function ViewInvoice() {
   const [partialAmt, setPartialAmt]       = useState('');
   const [payModalError, setPayModalError] = useState('');
   const [toasts, setToasts]         = useState([]);
+
+  // The website's own order number, looked up through orders.invoice_id.
+  // Leo Billing mints its own invoice number, so an order placed on the
+  // site otherwise loses its identity the moment it becomes a bill —
+  // and that number is what the customer quotes when they call.
+  const [websiteOrderNo, setWebsiteOrderNo] = useState('');
+
+  // QR for the balance still owed on this bill.
+  const [payQr, setPayQr] = useState('');
+
+  useEffect(() => {
+    if (!invoice?.id) return;
+    let cancelled = false;
+
+    supabase
+      .from('orders')
+      .select('order_no')
+      .eq('invoice_id', invoice.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!cancelled && data?.order_no) setWebsiteOrderNo(data.order_no);
+      });
+
+    return () => { cancelled = true; };
+  }, [invoice?.id]);
+
+  useEffect(() => {
+    const due = Number(invoice?.amount_due) || 0;
+    const account = enabledUpiAccounts(profile)[0];
+
+    // No QR when there's nothing to collect, or no UPI ID on file.
+    if (!account || due <= 0) { setPayQr(''); return; }
+
+    let cancelled = false;
+    const uri = buildUpiUri({
+      vpa: account.vpa,
+      payeeName: profile?.shop_name || 'Payment',
+      amount: due,
+      note: `Invoice ${invoice.invoice_no}`,
+      ref: invoice.invoice_no,
+    });
+
+    QRCode.toDataURL(uri, { width: 512, margin: 1, errorCorrectionLevel: 'M' })
+      .then(url => { if (!cancelled) setPayQr(url); })
+      .catch(() => { if (!cancelled) setPayQr(''); });
+
+    return () => { cancelled = true; };
+  }, [invoice?.amount_due, invoice?.invoice_no, profile]);
+
   const invoiceRef     = useRef();
   const downloadBtnRef = useRef();
 
@@ -579,6 +631,12 @@ const handlePaymentSubmit = async (payFull) => {
               <span className="vi__card-label">Invoice No</span>
               <span className="vi__card-val vi__card-val--gold">{invoice.invoice_no}</span>
             </div>
+            {websiteOrderNo && (
+              <div className="vi__card-row">
+                <span className="vi__card-label">Website Order</span>
+                <span className="vi__card-val">{websiteOrderNo}</span>
+              </div>
+            )}
             <div className="vi__card-row">
               <span className="vi__card-label">Date</span>
               <span className="vi__card-val">{dateDisplay}</span>
@@ -694,6 +752,27 @@ const handlePaymentSubmit = async (payFull) => {
             <div className="vi__words-text">{amountInWords}</div>
           </div>
         </div>
+
+        {/* Scan-to-pay for whatever is still owed on this bill.
+            Only rendered when there is a balance and a UPI ID on file —
+            a QR on a settled invoice invites a second payment. */}
+        {payQr && (
+          <div className="vi__card vi__payqr">
+            <div className="vi__card-head">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+                <path d="M14 3h7v7"/><path d="M3 14h7v7"/>
+              </svg>
+              <span>Scan to pay ₹{fmtAmt(amountDue)}</span>
+            </div>
+            <div className="vi__card-body vi__payqr-body">
+              <img className="vi__payqr-img" src={payQr} alt="UPI payment QR code" />
+              <p className="vi__payqr-note">
+                Any UPI app · amount is fixed in the code
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Bank & Terms */}
         {(shop.upi || shop.bank || shop.terms) && (

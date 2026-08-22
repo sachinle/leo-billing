@@ -14,6 +14,7 @@ import Settings from '../pages/Settings';
 import Profile from '../pages/Profile';
 import Analytics from '../pages/Analytics';
 import Website from '../pages/Website';
+import ReceivePayment from '../pages/ReceivePayment';
 import { useAuth } from '../hooks/useAuth';
 import { canManageWebsite } from '../services/permissions';
 import './Layout.css';
@@ -95,6 +96,7 @@ export default function Layout() {
             path="/website"
             element={canManageWebsite(user) ? <Website /> : <Navigate to="/dashboard" replace />}
           />
+          <Route path="/receive-payment" element={<ReceivePayment />} />
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/printer" element={<PrinterSettings />} />

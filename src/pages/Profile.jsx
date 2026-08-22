@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import UpiAccountsEditor from '../components/UpiAccountsEditor';
 import { useAuth } from '../hooks/useAuth';
 import { getProfile, saveProfile } from '../services/profileService';
 import './Profile.css';
@@ -69,8 +70,11 @@ const FIELD_GROUPS = [
         <line x1="1" y1="10" x2="23" y2="10"/>
       </svg>
     ),
+    // Rendered after this section's fields — a list needs custom UI,
+    // not another text input.
+    upiAccounts: true,
     fields: [
-      { key: 'upi_id',     label: 'UPI ID',        placeholder: 'name@upi' },
+      { key: 'upi_id',     label: 'UPI ID (primary / legacy)', placeholder: 'name@upi' },
       { key: 'bank_name',  label: 'Bank Name',     placeholder: 'Bank of Baroda' },
       { key: 'account_no', label: 'Account Number', placeholder: '47210110010525' },
       { key: 'ifsc_code',  label: 'IFSC Code',     placeholder: 'BARB0SUNCOI' },
@@ -117,6 +121,7 @@ const EMPTY_PROFILE = {
   gstin: '',
   fssai_no: '',           // ← new
   upi_id: '', bank_name: '', account_no: '', ifsc_code: '',
+  upi_accounts: [],
   signatory_name: '',     // ← new
   terms: 'Thank you for doing business with us.',
 };
@@ -312,6 +317,22 @@ export default function Profile() {
                   </div>
                 ))}
               </div>
+
+              {/* Extra UPI IDs, with a switch for which one is live.
+                  The website offers the first enabled account to
+                  customers, and Receive Payment lets you pick between
+                  them at the counter. */}
+              {group.upiAccounts && (
+                <>
+                  <label className="profile__label" style={{ marginTop: 18, display: 'block' }}>
+                    Additional UPI IDs
+                  </label>
+                  <UpiAccountsEditor
+                    accounts={form.upi_accounts}
+                    onChange={list => handleChange('upi_accounts', list)}
+                  />
+                </>
+              )}
             </div>
           </div>
         ))}
