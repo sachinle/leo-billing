@@ -1,3 +1,15 @@
+/* NOTE: entrance keyframes end at `transform: none`, never
+   `translateY(0)`.
+
+   Any transform value other than `none` makes the element a containing
+   block for its `position: fixed` descendants. These animations use
+   `fill-mode: both`, so the final frame sticks permanently — which meant
+   every page root stayed transformed, and the slide-over drawer and the
+   delete dialog were positioned against the page instead of the
+   viewport. The drawer scrolled away and got clipped; the dialog
+   centred itself on the whole document, so you had to scroll to find
+   it. `transform: none` looks identical and removes the containing
+   block. */
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&family=DM+Sans:wght@300;400;500&display=swap');
 
 .dashboard {
@@ -7,7 +19,7 @@
   transition: background 0.35s ease;
   animation: dashIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
-@keyframes dashIn { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+@keyframes dashIn { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform: none} }
 
 /* ── Header ── */
 .dashboard__header {
@@ -72,7 +84,7 @@
   animation: cardRise 0.5s cubic-bezier(0.16,1,0.3,1) both;
   transition: border-color 0.2s,transform 0.2s,box-shadow 0.2s,background 0.35s;
 }
-@keyframes cardRise { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+@keyframes cardRise { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform: none} }
 .stat-card:hover { border-color:rgba(201,169,110,0.4); transform:translateY(-2px); box-shadow:0 12px 32px rgba(0,0,0,0.3); }
 .stat-card__glow {
   position:absolute; top:-40px; right:-40px; width:100px; height:100px;
@@ -109,7 +121,7 @@
 .invoice-table thead tr { border-bottom:1px solid var(--border,rgba(201,169,110,0.18)); }
 .invoice-table th { padding:12px 24px; font-size:0.68rem; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-muted,#4e4b63); text-align:left; white-space:nowrap; transition:color 0.35s; }
 .invoice-table tbody tr { border-bottom:1px solid rgba(201,169,110,0.07); animation:rowIn 0.35s cubic-bezier(0.16,1,0.3,1) both; transition:background 0.15s ease; }
-@keyframes rowIn { from{opacity:0;transform:translateX(-8px)} to{opacity:1;transform:translateX(0)} }
+@keyframes rowIn { from{opacity:0;transform:translateX(-8px)} to{opacity:1;transform: none} }
 .invoice-table tbody tr:last-child{ border-bottom:none; }
 .invoice-table tbody tr:hover{ background:var(--gold-dim,rgba(201,169,110,0.04)); }
 .invoice-table td { padding:15px 24px; font-size:0.875rem; color:var(--text-secondary,#8a8598); transition:color 0.35s; white-space:nowrap; }

@@ -33,10 +33,11 @@ async function readError(res, fallback) {
   return fallback;
 }
 
-async function apiGet(resource) {
+async function apiGet(resource, params = {}) {
   let res;
+  const qs = new URLSearchParams({ resource, ...params });
   try {
-    res = await fetch(`${ENDPOINT}?resource=${encodeURIComponent(resource)}`, {
+    res = await fetch(`${ENDPOINT}?${qs}`, {
       headers: await authHeader(),
     });
   } catch {
@@ -135,3 +136,11 @@ export const deletePincode = (id) => apiPost({ action: 'delete_pincode', id });
 
 // ── Stats ────────────────────────────────────────────────────
 export const getWebsiteStats = () => apiGet('stats');
+
+// Website analytics for the Analytics screen.
+//
+// The website aggregates this server-side and returns only counts and
+// sums — no customer names, phones or addresses cross the network just
+// to draw a chart.
+export const getWebsiteAnalytics = (days = 30) =>
+  apiGet('website_analytics', { days: String(days) });

@@ -1,0 +1,213 @@
+/* Website analytics section on the Analytics page.
+   Uses the app's existing tokens so it inherits both themes. */
+
+.wa { margin-top: 44px; }
+
+.wa__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.wa__eyebrow {
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin: 0 0 4px;
+}
+.wa__title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.35rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.wa__ranges { display: flex; gap: 6px; }
+.wa__range {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: color 0.18s, border-color 0.18s, background 0.18s;
+}
+.wa__range:hover { color: var(--gold); border-color: var(--gold); }
+.wa__range.is-active {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #14141c;
+  font-weight: 600;
+}
+
+/* ── KPI row ── */
+.wa__kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.wa__kpi {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.wa__kpi--warn { border-color: var(--error-color); }
+.wa__kpi-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.wa__kpi-value {
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.15;
+}
+.wa__kpi-hint { font-size: 0.72rem; color: var(--text-muted); }
+
+/* ── Panels ── */
+.wa__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+}
+.wa__panel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px;
+  min-width: 0;
+}
+@media (min-width: 900px) {
+  .wa__grid { grid-template-columns: repeat(4, 1fr); }
+  .wa__panel { grid-column: span 2; }
+  .wa__panel--wide { grid-column: span 2; }
+}
+.wa__panel-title {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0 0 14px;
+  font-weight: 600;
+}
+
+/* ── Chart ── */
+.wa__chart svg {
+  width: 100%;
+  height: 96px;
+  display: block;
+  overflow: visible;
+}
+.wa__chart-foot {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* ── Bars ── */
+.wa__bars { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.wa__bar-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+.wa__bar-track {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--input-bg);
+  overflow: hidden;
+}
+.wa__bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--gold);
+  /* Width only — transitioning width is cheap here because these are
+     six short bars that animate once on load, not continuously. */
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── Ranked list ── */
+.wa__ranked { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.wa__ranked li {
+  display: grid;
+  grid-template-columns: 22px 1fr auto auto;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+}
+.wa__rank {
+  width: 22px; height: 22px;
+  border-radius: 6px;
+  background: var(--gold-dim);
+  color: var(--gold);
+  display: grid;
+  place-items: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+.wa__ranked-name {
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wa__ranked-qty { color: var(--text-muted); font-size: 0.78rem; }
+.wa__ranked-rev { color: var(--gold); font-weight: 600; }
+
+/* ── Pincodes ── */
+.wa__pins { display: flex; flex-wrap: wrap; gap: 8px; }
+.wa__pin {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.wa__pin-code { font-weight: 600; color: var(--text-primary); font-size: 0.88rem; }
+.wa__pin-count { font-size: 0.72rem; color: var(--text-muted); }
+
+.wa__empty { color: var(--text-muted); font-size: 0.85rem; margin: 0; }
+
+.wa__skeleton {
+  height: 260px;
+  border-radius: 14px;
+  background: var(--card);
+  border: 1px solid var(--border);
+}
+
+.wa__error {
+  background: var(--error-bg);
+  border: 1px solid var(--error-border);
+  border-radius: 14px;
+  padding: 20px;
+  color: var(--error-color);
+  font-size: 0.88rem;
+}
+.wa__error button {
+  margin-top: 10px;
+  border: 1px solid currentColor;
+  background: transparent;
+  color: inherit;
+  border-radius: 8px;
+  padding: 7px 16px;
+  cursor: pointer;
+  font-size: 0.82rem;
+}

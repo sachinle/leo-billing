@@ -1,3 +1,15 @@
+/* NOTE: entrance keyframes end at `transform: none`, never
+   `translateY(0)`.
+
+   Any transform value other than `none` makes the element a containing
+   block for its `position: fixed` descendants. These animations use
+   `fill-mode: both`, so the final frame sticks permanently — which meant
+   every page root stayed transformed, and the slide-over drawer and the
+   delete dialog were positioned against the page instead of the
+   viewport. The drawer scrolled away and got clipped; the dialog
+   centred itself on the whole document, so you had to scroll to find
+   it. `transform: none` looks identical and removes the containing
+   block. */
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap');
 
 .invoices {
@@ -7,7 +19,7 @@
   animation: pageIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
   transition: background 0.35s;
 }
-@keyframes pageIn { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+@keyframes pageIn { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform: none} }
 
 .invoices__header {
   display: flex; align-items: flex-end; justify-content: space-between;
@@ -99,7 +111,7 @@
   border-bottom:1px solid rgba(201,169,110,0.07); transition:background 0.15s;
   animation:rowIn 0.35s cubic-bezier(0.16,1,0.3,1) both;
 }
-@keyframes rowIn { from{opacity:0;transform:translateX(-6px)} to{opacity:1;transform:translateX(0)} }
+@keyframes rowIn { from{opacity:0;transform:translateX(-6px)} to{opacity:1;transform: none} }
 .invoices__table tbody tr:last-child { border-bottom:none; }
 .invoices__table tbody tr:hover { background:rgba(201,169,110,0.04); }
 .invoices__table td { padding:12px 14px; font-size:0.875rem; color:var(--text-secondary,#8a8598); vertical-align:middle; transition:color 0.35s; }
@@ -248,7 +260,7 @@
 /* Toast */
 .toast-container { position:fixed; bottom:24px; right:24px; z-index:300; display:flex; flex-direction:column; gap:8px; }
 .toast { display:flex; align-items:center; gap:10px; padding:12px 18px; border-radius:10px; font-family:'DM Sans',sans-serif; font-size:0.875rem; box-shadow:0 8px 24px rgba(0,0,0,0.3); animation:toastIn 0.3s cubic-bezier(0.16,1,0.3,1) both; }
-@keyframes toastIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
+@keyframes toastIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform: none} }
 .toast--success { background:rgba(112,196,154,0.15); border:1px solid rgba(112,196,154,0.3); color:#70c49a; }
 .toast--error   { background:rgba(224,112,112,0.12); border:1px solid rgba(224,112,112,0.25); color:#e07070; }
 

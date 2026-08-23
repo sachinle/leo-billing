@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import WebsiteAnalytics from '../components/WebsiteAnalytics';
 import { useAuth } from '../hooks/useAuth';
 import { getInvoices } from '../services/invoiceService';
 import { getCustomers } from '../services/customerService';
@@ -671,6 +672,11 @@ export default function Analytics() {
         </div>
       )}
 
+    
+      {/* Orders coming from the website — a different question to
+          invoices, so it gets its own section rather than being mixed
+          into the billing charts. */}
+      <WebsiteAnalytics />
     </div>
   );
 }

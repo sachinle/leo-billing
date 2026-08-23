@@ -1,3 +1,15 @@
+/* NOTE: entrance keyframes end at `transform: none`, never
+   `translateY(0)`.
+
+   Any transform value other than `none` makes the element a containing
+   block for its `position: fixed` descendants. These animations use
+   `fill-mode: both`, so the final frame sticks permanently — which meant
+   every page root stayed transformed, and the slide-over drawer and the
+   delete dialog were positioned against the page instead of the
+   viewport. The drawer scrolled away and got clipped; the dialog
+   centred itself on the whole document, so you had to scroll to find
+   it. `transform: none` looks identical and removes the containing
+   block. */
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap');
 
 /* ── Theme Variables ── */
@@ -102,7 +114,7 @@
 
 @keyframes cardIn {
   from { opacity: 0; transform: translateY(28px) scale(0.97); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+  to   { opacity: 1; transform: none; }
 }
 
 /* Corner brackets */
@@ -471,5 +483,5 @@
   45%  { transform: translateX(-4px); }
   60%  { transform: translateX(4px);  }
   75%  { transform: translateX(-2px); }
-  100% { transform: translateX(0);    opacity: 1; }
+  100% { transform: none;    opacity: 1; }
 }
