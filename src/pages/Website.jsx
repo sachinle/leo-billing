@@ -7,6 +7,7 @@ import {
   getWebsiteStats,
 } from '../services/websiteService';
 import './Website.css';
+import DeliveryAreas from '../components/DeliveryAreas';
 
 const WEBSITE_URL = import.meta.env.VITE_WEBSITE_API_URL || 'http://localhost:3000';
 
@@ -522,7 +523,15 @@ export default function Website() {
 
       <div className="web__body">
         {tab === 'orders'   && <OrdersTab   toast={toast} />}
-        {tab === 'delivery' && <DeliveryTab toast={toast} />}
+        {tab === 'delivery' && (
+          <DeliveryAreas
+            toast={toast}
+            /* The pincode editor is passed in rather than moved, so
+               it stays exactly as it was and keeps its existing
+               data and behaviour. */
+            pincodeEditor={(t) => <DeliveryTab toast={t} />}
+          />
+        )}
       </div>
     </div>
   );

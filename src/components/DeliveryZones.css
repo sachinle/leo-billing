@@ -1,0 +1,142 @@
+/* Delivery zones editor. Uses the app's tokens so it inherits both themes. */
+
+.dz { display: grid; gap: 18px; }
+.dz__intro { color: var(--text-muted); font-size: 0.88rem; margin: 0; line-height: 1.6; }
+
+.dz__editor {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px;
+  display: grid;
+  gap: 14px;
+}
+
+.dz__shape-toggle {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  width: fit-content;
+}
+.dz__shape {
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 9px;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+}
+.dz__shape.is-on { background: var(--gold); color: #14141c; font-weight: 600; }
+
+.dz__label {
+  display: block;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+  margin-bottom: 7px;
+}
+.dz__label strong { color: var(--gold); font-size: 0.95rem; letter-spacing: 0; }
+
+.dz__radius input[type="range"] { width: 100%; accent-color: var(--gold); cursor: pointer; }
+
+.dz__presets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.dz__preset {
+  border: 1px solid var(--border);
+  background: var(--input-bg);
+  color: var(--text-secondary);
+  border-radius: 999px;
+  padding: 6px 13px;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+.dz__preset.is-on { border-color: var(--gold); color: var(--gold); }
+
+.dz__points {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.dz__clear {
+  border: 0; background: transparent; color: var(--error-color);
+  font-size: 0.8rem; cursor: pointer; text-decoration: underline;
+}
+
+.dz__fields { display: grid; gap: 12px; grid-template-columns: 1fr; }
+@media (min-width: 560px) { .dz__fields { grid-template-columns: 2fr 1fr; } }
+
+.dz__field input {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 11px 13px;
+  background: var(--input-bg);
+  color: var(--text-primary);
+  font-size: 0.92rem;
+  outline: none;
+}
+.dz__field input:focus { border-color: var(--gold); }
+
+.dz__actions { display: flex; gap: 10px; }
+.dz__save {
+  border: 0; border-radius: 10px; padding: 12px 26px;
+  background: var(--gold); color: #14141c;
+  font-weight: 600; font-size: 0.9rem; cursor: pointer;
+}
+.dz__save:disabled { opacity: 0.45; cursor: not-allowed; }
+.dz__cancel {
+  border: 1px solid var(--border); border-radius: 10px; padding: 12px 22px;
+  background: transparent; color: var(--text-muted); cursor: pointer; font-size: 0.9rem;
+}
+
+.dz__list-title {
+  font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--text-muted); margin: 0; font-weight: 600;
+}
+.dz__empty { color: var(--text-muted); font-size: 0.88rem; margin: 0; }
+.dz__skeleton { height: 80px; border-radius: 12px; background: var(--card); border: 1px solid var(--border); }
+
+.dz__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.dz__row {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 12px 14px;
+}
+.dz__row.is-off { opacity: 0.55; }
+.dz__row-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.dz__row-name { font-weight: 600; color: var(--text-primary); font-size: 0.9rem; }
+.dz__row-meta { font-size: 0.76rem; color: var(--text-muted); }
+
+.dz__edit {
+  border: 1px solid var(--border); background: transparent; color: var(--text-secondary);
+  border-radius: 8px; padding: 6px 13px; font-size: 0.78rem; cursor: pointer;
+}
+.dz__edit:hover { border-color: var(--gold); color: var(--gold); }
+
+.dz__delete {
+  border: 0; background: transparent; color: var(--text-muted);
+  font-size: 1.3rem; line-height: 1; cursor: pointer; padding: 0 4px;
+}
+.dz__delete:hover { color: var(--error-color); }
+
+.dz__toggle { position: relative; display: inline-flex; flex-shrink: 0; }
+.dz__toggle input { position: absolute; opacity: 0; width: 0; height: 0; }
+.dz__toggle span {
+  width: 38px; height: 22px; border-radius: 999px; background: var(--border);
+  display: inline-block; position: relative; transition: background 0.18s; cursor: pointer;
+}
+.dz__toggle span::after {
+  content: ''; position: absolute; top: 3px; left: 3px;
+  width: 16px; height: 16px; border-radius: 50%; background: #fff;
+  transition: transform 0.18s;
+}
+.dz__toggle input:checked + span { background: var(--gold); }
+.dz__toggle input:checked + span::after { transform: translateX(16px); }

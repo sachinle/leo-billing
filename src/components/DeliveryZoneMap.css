@@ -1,0 +1,79 @@
+/* Delivery zone map. Uses the app's existing tokens so it inherits both
+   themes without a second palette. */
+
+.dzm { display: grid; gap: 10px; }
+
+.dzm__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.dzm__btn {
+  border: 1px solid var(--border);
+  background: var(--input-bg);
+  color: var(--text-primary);
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: border-color 0.18s, color 0.18s;
+}
+.dzm__btn:hover:not(:disabled) { border-color: var(--gold); color: var(--gold); }
+.dzm__btn:disabled { opacity: 0.55; cursor: default; }
+
+.dzm__hint { font-size: 0.8rem; color: var(--text-muted); flex: 1; min-width: 200px; }
+.dzm__error { color: var(--error-color); font-size: 0.82rem; margin: 0; }
+
+.dzm__map {
+  height: 380px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  /* Leaflet paints tiles into absolutely positioned panes; without a
+     stacking context of its own they can sit above the app's drawers
+     and dialogs. */
+  position: relative;
+  z-index: 0;
+}
+@media (max-width: 640px) { .dzm__map { height: 300px; } }
+
+.dzm__attrib { margin: 0; font-size: 0.7rem; color: var(--text-muted); }
+
+/* Markers. Built as divIcons rather than Leaflet's default PNGs, whose
+   relative URLs break under a bundler. */
+.dzm__pin-wrap { background: none; border: none; }
+
+.dzm__pin {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+.dzm__pin--shop {
+  background: var(--gold);
+  border: 3px solid #14141c;
+  box-shadow: 0 0 0 2px var(--gold);
+}
+.dzm__pin--vertex {
+  background: #fff;
+  border: 3px solid var(--gold);
+  cursor: move;
+}
+
+/* Leaflet's own chrome, themed. Its stylesheet assumes a light page. */
+.dzm .leaflet-container { background: var(--input-bg); font-family: inherit; }
+.dzm .leaflet-control-zoom a {
+  background: var(--card);
+  color: var(--text-primary);
+  border-color: var(--border);
+}
+.dzm .leaflet-control-zoom a:hover { background: var(--input-bg); color: var(--gold); }
+.dzm .leaflet-control-attribution {
+  background: rgba(0, 0, 0, 0.55);
+  color: var(--text-muted);
+  font-size: 0.65rem;
+}
+.dzm .leaflet-control-attribution a { color: var(--gold); }

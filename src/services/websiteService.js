@@ -144,3 +144,16 @@ export const getWebsiteStats = () => apiGet('stats');
 // to draw a chart.
 export const getWebsiteAnalytics = (days = 30) =>
   apiGet('website_analytics', { days: String(days) });
+
+// ── Delivery zones (map-drawn areas, migration 0016) ──
+export const getZones = () => apiGet('zones');
+
+export const saveZone = (zone) => apiPost({ action: 'save_zone', ...zone });
+
+export const setZoneActive = (id, isActive) =>
+  apiPost({ action: 'set_zone_active', id, is_active: isActive });
+
+export const deleteZone = (id) => apiPost({ action: 'delete_zone', id });
+
+/** Which delivery check customers are actually getting right now. */
+export const getDeliveryMode = () => apiGet('delivery_mode');
